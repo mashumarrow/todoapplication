@@ -19,13 +19,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./backend:/app
-    environment:
-      - DB_USER=root
-      - DB_PASSWORD=your_password
-      - DB_NAME=schedule_todo
-      - DB_HOST=db
-      - DB_PORT=3306
+      - ./backend:/cmd
     depends_on:
       - db
 
