@@ -34,5 +34,5 @@ func InitDB() {
         log.Fatalf("データベース接続失敗: %v", errDB)
     }
 
-    //DB.AutoMigrate(&models.User{}, &models.Schedule{}, &models.Todo{}) //自動マイグレーション
+    
 }

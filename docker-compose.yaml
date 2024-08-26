@@ -27,7 +27,6 @@ services:
     image: mysql:8.0
     container_name: mysql-db #コンテナ名を指定
     environment: # 環境変数を指定
-      MYSQL_ALLOW_EMPTY_PASSWORD: 1 # パスワードを空にする
       MYSQL_DATABASE: schedule_todo
       TZ: "Asia/Tokyo" # タイムゾーンを指定
     ports:

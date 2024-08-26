@@ -1,8 +1,8 @@
 -- +goose Up
 CREATE TABLE  subject(
-    id INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-    name VARCHAR() NOT NULL,
-    PRIMARY KEY(id)
+    SubjectID BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
+    SubjectName VARCHAR(255)
+   
 );
 -- +goose StatementBegin
 SELECT 'up SQL query';

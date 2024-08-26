@@ -1,12 +1,11 @@
 -- +goose Up
 CREATE TABLE IF NOT EXISTS todos (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    completed BOOLEAN DEFAULT FALSE,
-    subject_id BIGINT UNSIGNED NOT NULL,
-    user_id BIGINT UNSIGNED NOT NULL,
-    FOREIGN KEY (subject_id) REFERENCES subjects(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    UserID BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    Title VARCHAR(255) NOT NULL,
+    Completed BOOLEAN DEFAULT FALSE,
+    SubjectID BIGINT UNSIGNED NOT NULL,
+    FOREIGN KEY (SubjectID) REFERENCES subject(SubjectID),
+    FOREIGN KEY (UserID) REFERENCES users(UserID)
 );
 -- +goose StatementBegin
 SELECT 'up SQL query';
