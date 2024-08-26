@@ -2,25 +2,99 @@
 
 package model
 
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
 type Mutation struct {
 }
 
 type Query struct {
 }
-
-type Todo struct {
-    ID     string
-    Text   string
-    Done   bool
-    User   *User   
-    UserID string  }
-
 type NewTodo struct {
-    Text   string
-    UserID string  
+	UserID    string
+	Title     string
+	SubjectID string
+  }
+  
+  type Todo struct {
+	ID        string
+	Title     string
+	Completed bool
+	Subject   *Subject
+	User      *User
+  }
+  
+  type User struct {
+	ID      string
+	UserID  string
+	Name    string
+	Email   string
+	Todos   []*Todo
+  }
+
+
+  
+  type Subject struct {
+	subjectId string
+	subjectName string
+	todos []*Todo
+  }
+  
+  type Classroom struct {
+	classroomId string
+	classroomName string
+  }
+  
+  
+  
+type DayOfWeek string
+
+const (
+	DayOfWeekMonday    DayOfWeek = "Monday"
+	DayOfWeekTuesday   DayOfWeek = "Tuesday"
+	DayOfWeekWednesday DayOfWeek = "Wednesday"
+	DayOfWeekThursday  DayOfWeek = "Thursday"
+	DayOfWeekFriday    DayOfWeek = "Friday"
+	DayOfWeekSaturday  DayOfWeek = "Saturday"
+)
+
+var AllDayOfWeek = []DayOfWeek{
+	DayOfWeekMonday,
+	DayOfWeekTuesday,
+	DayOfWeekWednesday,
+	DayOfWeekThursday,
+	DayOfWeekFriday,
+	DayOfWeekSaturday,
 }
 
-type User struct {
-    ID   string
-    Name string
+func (e DayOfWeek) IsValid() bool {
+	switch e {
+	case DayOfWeekMonday, DayOfWeekTuesday, DayOfWeekWednesday, DayOfWeekThursday, DayOfWeekFriday, DayOfWeekSaturday:
+		return true
+	}
+	return false
+}
+
+func (e DayOfWeek) String() string {
+	return string(e)
+}
+
+func (e *DayOfWeek) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = DayOfWeek(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid DayOfWeek", str)
+	}
+	return nil
+}
+
+func (e DayOfWeek) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

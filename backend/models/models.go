@@ -1,23 +1,31 @@
 package models
 
-//"gorm.io/gorm"
+import "gorm.io/gorm"
+type User struct {
+    gorm.Model
+	UserID string `json:"userId"`  // UserIDをuint型に変更
+    Name  string
+    Email string
+    Todos []Todo
+}
 
 type NewTodo struct {
+	UserID    uint   `json:"userId"`
     Title     string `json:"title"`
     SubjectID uint   `json:"subjectId"`
 }
 type Subject struct {
-    ID   uint   `gorm:"primaryKey"`
-    Name string 
+    SubjectID   uint   `gorm:"primaryKey"`
+    SubjectName string 
 }
 
 type Classroom struct {
-    ID   uint   `gorm:"primaryKey"`
-    Name string 
+    ClassroomID   uint   `gorm:"primaryKey"`
+    ClassroomName string 
 }
 
 type Schedule struct {
-    ID         uint   `gorm:"primaryKey"`
+    UserID         uint   `gorm:"primaryKey"`
     SubjectID  uint   `gorm:"not null"`
     ClassroomID uint  `gorm:"not null"`
     DayOfWeek  string `gorm:"type:enum('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');not null"`
@@ -27,9 +35,11 @@ type Schedule struct {
 }
 
 type Todo struct {
-    ID        uint   `gorm:"primaryKey"`
+	gorm.Model
     SubjectID uint   `gorm:"not null"`
     Title     string 
     Completed bool   `gorm:"default:false"`
     Subject   Subject
+    UserID    uint   `json:"userId"`
+    User      User
 }

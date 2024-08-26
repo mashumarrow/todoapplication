@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
     "log"
@@ -23,8 +23,13 @@ func (s *Server) Start() {
     mux := http.NewServeMux()
     mux.Handle("/playground", handler.NewPlaygroundHandler())
     mux.Handle("/query", handler.NewGraphQLHandler(s.DB))
+    mux.HandleFunc("/users", handler.CreateUserHandler(s.DB))
+    mux.HandleFunc("/users/get", handler.GetUserHandler(s.DB))
+    mux.HandleFunc("/todos", handler.CreateTodoHandler(s.DB))
+    mux.HandleFunc("/todos/get", handler.GetTodosHandler(s.DB))
+    mux.HandleFunc("/subjects", handler.CreateSubjectHandler(s.DB))
+    mux.HandleFunc("/subjects/get", handler.GetSubjectsHandler(s.DB))
 
     log.Printf("サーバーが起動しました: http://localhost:%s/playground", s.Port)
     log.Fatal(http.ListenAndServe(":"+s.Port, mux))
 }
-

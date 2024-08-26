@@ -1,11 +1,31 @@
-type Subject {
+input NewTodo {
+  userId: ID!
+  title: String!
+  subjectId: ID!
+}
+
+type Todo {
   id: ID!
+  title: String!
+  completed: Boolean!
+  subject: Subject
+  user: User
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  todos: [Todo]
+}
+type Subject {
+  subjectID: ID!
   name: String!
   todos: [Todo]
 }
 
 type Classroom {
-  id: ID!
+  classroomID: ID!
   name: String
 }
 

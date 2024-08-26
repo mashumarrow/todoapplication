@@ -1,28 +1,76 @@
-# GraphQL schema example
-#
-# https://gqlgen.com/getting-started/
+type User {
+  id: ID!
+  userId: String!
+  name: String!
+  email: String!
+  todos: [Todo]
+}
 
 type Todo {
   id: ID!
-  text: String!
-  done: Boolean!
+  title: String!
+  completed: Boolean!
+  subject: Subject!
   user: User!
 }
+type NewTodo {
+  userId: ID!
+  title: String!
+  subjectId: ID!
+}
 
-type User {
+type Subject {
+  subjectId: ID!
+  subjectName: String!
+  todos: [Todo]
+}
+
+type Classroom {
+  classroomId: ID!
+  classroomName: String!
+}
+
+enum DayOfWeek {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+}
+
+type Schedule {
   id: ID!
-  name: String!
+  user: User!
+  subject: Subject!
+  classroom: Classroom!
+  dayOfWeek: DayOfWeek!
+  period: Int!
 }
 
 type Query {
+  users: [User!]!
+  user(id: ID!): User
   todos: [Todo!]!
-}
-
-input NewTodo {
-  text: String!
-  userId: String!
+  todo(id: ID!): Todo
+  subjects: [Subject!]!
+  subject(id: ID!): Subject
+  classrooms: [Classroom!]!
+  classroom(id: ID!): Classroom
+  schedules(dayOfWeek: DayOfWeek!): [Schedule!]!
 }
 
 type Mutation {
-  createTodo(input: NewTodo!): Todo!
+  createUser(userId: String!, name: String!, email: String!): User!
+  createTodo(userId: ID!, title: String!, subjectId: ID!): Todo!
+  createSubject(subjectName: String!): Subject!
+  createClassroom(classroomName: String!): Classroom!
+  createSchedule(
+    userId: ID!
+    subjectId: ID!
+    classroomId: ID!
+    dayOfWeek: DayOfWeek!
+    period: Int!
+  ): Schedule!
+  toggleTodoComplete(todoId: ID!): Todo!
 }

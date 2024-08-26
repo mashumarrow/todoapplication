@@ -76,8 +76,14 @@ autobind:
 # your liking
 models:
   NewTodo:
-    model:
+    model: 
       - github.com/mashumarrow/todoapplication/backend/models.NewTodo
+  Todo:
+    model:
+      - github.com/mashumarrow/todoapplication/backend/models.Todo
+  User:
+    model: 
+      - github.com/mashumarrow/todoapplication/backend/models.User
   Todo:
     model:
       - github.com/mashumarrow/todoapplication/backend/models.Todo
