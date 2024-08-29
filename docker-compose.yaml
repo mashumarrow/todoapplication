@@ -1,16 +1,6 @@
 version: "3.8"
 
 services:
-  frontend:
-    image: node:14-alpine # Node.js の公式イメージを指定
-    working_dir: /app
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
-    depends_on:
-      - backend
-
   backend:
     build:
       context: ./backend
@@ -18,8 +8,6 @@ services:
     container_name: grahql-backend
     ports:
       - "8080:8080"
-    volumes:
-      - ./backend:/cmd
     depends_on:
       - db
 

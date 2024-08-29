@@ -1,5 +1,10 @@
-FROM golang:1.23
-WORKDIR /cmd
+FROM golang:1.23 
+WORKDIR /app
+
+# ソースコード全体をコンテナにコピー
 COPY . .
-#RUN go build -o main .
-CMD ["/main"]
+
+# アプリケーションをビルドしてmainバイナリを作成
+RUN go build -o main ./cmd
+
+CMD ["./main"]
