@@ -1,10 +1,21 @@
 FROM golang:1.23 
-WORKDIR /app
 
+WORKDIR /go/src/github.com/mashumarrow/todoapplication/backend/
+
+COPY go.mod ./
+COPY go.sum ./
+
+RUN go mod download
 # ソースコード全体をコンテナにコピー
 COPY . .
 
-# アプリケーションをビルドしてmainバイナリを作成
-RUN go build -o main ./cmd
+COPY  /cmd/.env .env
+COPY .air.toml .air.toml
 
-CMD ["./main"]
+# migration用にgooseをインストール
+RUN go install github.com/pressly/goose/v3/cmd/goose@v3.21.1
+
+#Airをインストール
+RUN go install github.com/air-verse/air@latest
+
+CMD ["air", "-c", ".air.toml"]

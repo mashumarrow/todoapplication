@@ -6,6 +6,9 @@ services:
       context: ./backend
       dockerfile: Dockerfile # backendディレクトリ内のDockerfileを使用
     container_name: grahql-backend
+    command: sh -c "goose -dir db/migrations mysql \"${DB_USER}:${DB_PASSWORD}@tcp(${DB_HOST}:${DB_PORT})/${DB_NAME}" up && air -c .air.toml"
+    env_file:
+      - ./backend/cmd/.env
     ports:
       - "8080:8080"
     depends_on:

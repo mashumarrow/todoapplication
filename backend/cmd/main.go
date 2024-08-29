@@ -14,7 +14,8 @@ import (
 
 func main() {
 
-    
+    // データベースを初期化
+    database.InitDB()
 
     
     // サーバーを作成
@@ -23,7 +24,6 @@ func main() {
     // サーバーを開始
     srv.Start()
 
-    // データベースを初期化
-    database.InitDB()
+    
     
 }
