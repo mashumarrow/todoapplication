@@ -14,7 +14,7 @@ import (
 
 func main() {
     // データベースを初期化
-    database.InitDB()
+    //database.InitDB()
 
     // サーバーを作成
     srv := server.NewServer(database.DB, "8080")
