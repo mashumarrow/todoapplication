@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS todos (
     Title VARCHAR(255) NOT NULL,
     Completed BOOLEAN DEFAULT FALSE,
     SubjectID BIGINT UNSIGNED NOT NULL,
-    FOREIGN KEY (SubjectID) REFERENCES subject(SubjectID),
+    FOREIGN KEY (SubjectID) REFERENCES subjects(SubjectID),
     FOREIGN KEY (UserID) REFERENCES users(UserID)
 );
 -- +goose StatementBegin

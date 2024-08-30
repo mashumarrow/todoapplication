@@ -6,6 +6,8 @@ COPY go.mod ./
 COPY go.sum ./
 
 RUN go mod download
+# nc (Netcat) をインストール
+RUN apt-get update && apt-get install -y netcat-openbsd
 # ソースコード全体をコンテナにコピー
 COPY . .
 

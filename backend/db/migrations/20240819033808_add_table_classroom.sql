@@ -1,6 +1,6 @@
 -- +goose Up
-CREATE TABLE Classroom (
-    ClassroomID BIGINT UNSIGNED AUTO_INCREMENTPRIMARY KEY,
+CREATE TABLE classrooms (
+    ClassroomID BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     ClassroomNAme VARCHAR(255));
 -- +goose StatementBegin
 SELECT 'up SQL query';

@@ -1,5 +1,5 @@
 -- +goose Up
-CREATE TABLE  subject(
+CREATE TABLE  subjects(
     SubjectID BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
     SubjectName VARCHAR(255)
    
