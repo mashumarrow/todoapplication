@@ -20,17 +20,38 @@ func (r *classroomResolver) Classroomid(ctx context.Context, obj *models.Classro
 
 // CreateClassroom is the resolver for the createClassroom field.
 func (r *mutationResolver) CreateClassroom(ctx context.Context, input model.NewClassroom) (*models.Classroom, error) {
-	panic(fmt.Errorf("not implemented: CreateClassroom - createClassroom"))
+	classroom:= &models.Classroom{
+		ClassroomName:  input.Classroomname,
+	
+	}
+
+	if err := r.DB.Create(classroom).Error; err != nil {
+		return nil, err
+	}
+
+	return classroom, nil
+
 }
 
 // Classrooms is the resolver for the classrooms field.
 func (r *queryResolver) Classrooms(ctx context.Context) ([]*models.Classroom, error) {
-	panic(fmt.Errorf("not implemented: Classrooms - classrooms"))
+	var classrooms []*models.Classroom
+	
+		if err := r.DB.Find(&classrooms).Error; err != nil {
+			return nil, err
+		}
+	
+		return classrooms, nil
+
 }
 
 // Classroom is the resolver for the classroom field.
 func (r *queryResolver) Classroom(ctx context.Context, classroomid string) (*models.Classroom, error) {
-	panic(fmt.Errorf("not implemented: Classroom - classroom"))
+	var classroom models.Classroom
+	if err := r.DB.Find(&classroom).Error; err != nil {
+        return nil, err
+    }
+    return &classroom, nil
 }
 
 // Classroom returns graph.ClassroomResolver implementation.

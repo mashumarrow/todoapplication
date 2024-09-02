@@ -4,8 +4,7 @@ import (
     
     "github.com/mashumarrow/todoapplication/backend/db/migrations"
     "github.com/mashumarrow/todoapplication/backend/server"
-    //"gorm.io/driver/mysql"
-   // "gorm.io/gorm"
+    
 )
 
 

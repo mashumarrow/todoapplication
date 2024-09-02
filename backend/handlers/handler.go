@@ -123,3 +123,4 @@ func CreateSubjectHandler(db *gorm.DB) http.HandlerFunc {
         json.NewEncoder(w).Encode(subject)
     }
 }
+

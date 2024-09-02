@@ -15,17 +15,38 @@ import (
 
 // CreateSubject is the resolver for the createSubject field.
 func (r *mutationResolver) CreateSubject(ctx context.Context, input model.NewSubject) (*models.Subject, error) {
-	panic(fmt.Errorf("not implemented: CreateSubject - createSubject"))
+	subject := &models.Subject{
+		SubjectName: input.Subjectname,
+	
+	}
+
+	if err := r.DB.Create(subject).Error; err != nil {
+		return nil, err
+	}
+
+	return subject, nil
+
 }
 
 // Subjects is the resolver for the subjects field.
 func (r *queryResolver) Subjects(ctx context.Context) ([]*models.Subject, error) {
-	panic(fmt.Errorf("not implemented: Subjects - subjects"))
+	
+		var subjects []*models.Subject
+	
+		if err := r.DB.Find(&subjects).Error; err != nil {
+			return nil, err
+		}
+	
+		return subjects, nil
 }
 
 // Subject is the resolver for the subject field.
 func (r *queryResolver) Subject(ctx context.Context, subjectid *string) (*models.Subject, error) {
-	panic(fmt.Errorf("not implemented: Subject - subject"))
+	var subject models.Subject
+	if err := r.DB.Find(&subject).Error; err != nil {
+        return nil, err
+    }
+    return &subject, nil
 }
 
 // Subjectid is the resolver for the subjectid field.

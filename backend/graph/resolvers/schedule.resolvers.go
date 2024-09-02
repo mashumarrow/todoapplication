@@ -15,17 +15,38 @@ import (
 
 // Createschedule is the resolver for the createschedule field.
 func (r *mutationResolver) Createschedule(ctx context.Context, input model.NewSchedule) (*models.Schedule, error) {
-	panic(fmt.Errorf("not implemented: Createschedule - createschedule"))
+	schedule:= &models.Schedule{
+		DayOfWeek:  string(input.Dayofweek),
+		Period: input.Period,
+	}
+
+	if err := r.DB.Create(schedule).Error; err != nil {
+		return nil, err
+	}
+
+	return schedule, nil
+
 }
 
 // Schedules is the resolver for the schedules field.
 func (r *queryResolver) Schedules(ctx context.Context) ([]*models.Schedule, error) {
-	panic(fmt.Errorf("not implemented: Schedules - schedules"))
+	var schedules []*models.Schedule
+	
+		if err := r.DB.Find(&schedules).Error; err != nil {
+			return nil, err
+		}
+	
+		return schedules, nil
+
 }
 
 // Schedule is the resolver for the schedule field.
 func (r *queryResolver) Schedule(ctx context.Context, userid string) (*models.Schedule, error) {
-	panic(fmt.Errorf("not implemented: Schedule - schedule"))
+	var schedule models.Schedule
+	if err := r.DB.Where("user_id = ?", userid).First(&schedule).Error; err != nil {
+        return nil, err
+    }
+    return &schedule, nil
 }
 
 // Userid is the resolver for the userid field.

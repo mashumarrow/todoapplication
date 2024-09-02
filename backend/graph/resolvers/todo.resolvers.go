@@ -7,6 +7,7 @@ package resolvers
 import (
 	"context"
 	"fmt"
+	
 
 	"github.com/mashumarrow/todoapplication/backend/graph"
 	"github.com/mashumarrow/todoapplication/backend/models"
@@ -14,17 +15,38 @@ import (
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input models.NewTodo) (*models.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+   todo := &models.Todo{
+		Title:  input.Title,
+		UserID:    input.UserID,
+		SubjectID: input.SubjectID,
+	}
+
+	if err := r.DB.Create(todo).Error; err != nil {
+		return nil, err
+	}
+
+	return todo, nil
 }
+
 
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*models.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+	var todos []*models.Todo
+
+	if err := r.DB.Preload("Subject").Find(&todos).Error; err != nil {
+		return nil, err
+	}
+
+	return todos, nil
 }
 
 // Todo is the resolver for the todo field.
 func (r *queryResolver) Todo(ctx context.Context, userid string) (*models.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todo - todo"))
+	var todo models.Todo
+	if err := r.DB.Where("user_id = ?", userid).First(&todo).Error; err != nil {
+        return nil, err
+    }
+    return &todo, nil
 }
 
 // Userid is the resolver for the userid field.

@@ -6,7 +6,7 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
+	
 
 	"github.com/mashumarrow/todoapplication/backend/graph/model"
 	"github.com/mashumarrow/todoapplication/backend/models"
@@ -14,10 +14,26 @@ import (
 
 // RegisterUser is the resolver for the registerUser field.
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.NewUser) (*models.User, error) {
-	panic(fmt.Errorf("not implemented: RegisterUser - registerUser"))
+	user := &models.User{
+		Name:  input.Name,
+		
+	}
+
+	if err := r.DB.Create(user).Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
+
+	
 }
 
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, userid string) (*models.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
+	var user models.User
+	if err := r.DB.Find(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+
 }
