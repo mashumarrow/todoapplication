@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/mashumarrow/todoapplication/backend/graph"
+	"github.com/mashumarrow/todoapplication/backend/graph/resolvers"
 
 	"github.com/mashumarrow/todoapplication/backend/models"
 
@@ -18,7 +19,7 @@ import (
 // NewGraphQLHandler はGraphQLサーバーのハンドラーを作成
 func NewGraphQLHandler(db *gorm.DB) http.Handler {
     
-    srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{DB: db}}))
+    srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &resolvers.Resolver{DB: db}}))
     return srv
 }
 
