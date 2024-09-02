@@ -1,0 +1,31 @@
+type Schedule {
+  userid: ID!
+  subject: Subject!
+  classroom: Classroom!
+  dayofweek: Dayofweek!
+  period: Int!
+  todo: Todo
+}
+
+enum Dayofweek {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+}
+
+input NewSchedule {
+  dayofweek: Dayofweek!
+  period: Int!
+}
+
+extend type Query {
+  schedules: [Schedule!]!
+  schedule(userid: ID!): Schedule!
+}
+
+extend type Mutation {
+  createschedule(input: NewSchedule!): Schedule!
+}

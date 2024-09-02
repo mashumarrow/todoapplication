@@ -1,6 +1,6 @@
 # Where are all the schema files located? globs are supported eg  src/**/*.graphqls
 schema:
-  - graph/*.graphqls
+  - graph/schemas/*.gql
 
 # Where should the generated server code go?
 exec:
@@ -20,8 +20,8 @@ model:
 # Where should the resolver implementations go?
 resolver:
   layout: follow-schema
-  dir: graph
-  package: graph
+  dir: graph/resolvers
+  package: resolvers
   filename_template: "{name}.resolvers.go"
   # Optional: turn on to not generate template comments above resolvers
   # omit_template_comment: false
@@ -75,30 +75,14 @@ autobind:
 # modelgen, the others will be allowed when binding to fields. Configure them to
 # your liking
 models:
-  NewTodo:
-    model: 
-      - github.com/mashumarrow/todoapplication/backend/models.NewTodo
-  Todo:
-    model:
-      - github.com/mashumarrow/todoapplication/backend/models.Todo
-  User:
-    model: 
-      - github.com/mashumarrow/todoapplication/backend/models.User
-  Todo:
-    model:
-      - github.com/mashumarrow/todoapplication/backend/models.Todo
-  Subject:
-    model:
-      - github.com/mashumarrow/todoapplication/backend/models.Subject
-  Classroom:
-    model:
-      - github.com/mashumarrow/todoapplication/backend/models.Classroom
-  Schedule:
-    model:
-      - github.com/mashumarrow/todoapplication/backend/models.Schedule
   ID:
     model:
       - github.com/99designs/gqlgen/graphql.ID
+      - github.com/99designs/gqlgen/graphql.Int
+      - github.com/99designs/gqlgen/graphql.Int64
+      - github.com/99designs/gqlgen/graphql.Int32
+  Int:
+    model:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32

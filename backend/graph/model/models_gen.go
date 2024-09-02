@@ -11,90 +11,71 @@ import (
 type Mutation struct {
 }
 
+type NewClassroom struct {
+	Classroomname string `json:"classroomname"`
+}
+
+type NewSchedule struct {
+	Dayofweek Dayofweek `json:"dayofweek"`
+	Period    int       `json:"period"`
+}
+
+type NewSubject struct {
+	Subjectname string `json:"subjectname"`
+}
+
+type NewUser struct {
+	Name string `json:"name"`
+}
+
 type Query struct {
 }
-type NewTodo struct {
-	UserID    string
-	Title     string
-	SubjectID string
-  }
-  
-  type Todo struct {
-	ID        string
-	Title     string
-	Completed bool
-	Subject   *Subject
-	User      *User
-  }
-  
-  type User struct {
-	ID      string
-	UserID  string
-	Name    string
-	Email   string
-	Todos   []*Todo
-  }
 
-
-  
-  type Subject struct {
-	subjectId string
-	subjectName string
-	todos []*Todo
-  }
-  
-  type Classroom struct {
-	classroomId string
-	classroomName string
-  }
-  
-  
-  
-type DayOfWeek string
+type Dayofweek string
 
 const (
-	DayOfWeekMonday    DayOfWeek = "Monday"
-	DayOfWeekTuesday   DayOfWeek = "Tuesday"
-	DayOfWeekWednesday DayOfWeek = "Wednesday"
-	DayOfWeekThursday  DayOfWeek = "Thursday"
-	DayOfWeekFriday    DayOfWeek = "Friday"
-	DayOfWeekSaturday  DayOfWeek = "Saturday"
+	DayofweekMonday    Dayofweek = "Monday"
+	DayofweekTuesday   Dayofweek = "Tuesday"
+	DayofweekWednesday Dayofweek = "Wednesday"
+	DayofweekThursday  Dayofweek = "Thursday"
+	DayofweekFriday    Dayofweek = "Friday"
+	DayofweekSaturday  Dayofweek = "Saturday"
 )
 
-var AllDayOfWeek = []DayOfWeek{
-	DayOfWeekMonday,
-	DayOfWeekTuesday,
-	DayOfWeekWednesday,
-	DayOfWeekThursday,
-	DayOfWeekFriday,
-	DayOfWeekSaturday,
+var AllDayofweek = []Dayofweek{
+	DayofweekMonday,
+	DayofweekTuesday,
+	DayofweekWednesday,
+	DayofweekThursday,
+	DayofweekFriday,
+	DayofweekSaturday,
 }
 
-func (e DayOfWeek) IsValid() bool {
+func (e Dayofweek) IsValid() bool {
 	switch e {
-	case DayOfWeekMonday, DayOfWeekTuesday, DayOfWeekWednesday, DayOfWeekThursday, DayOfWeekFriday, DayOfWeekSaturday:
+	case DayofweekMonday, DayofweekTuesday, DayofweekWednesday, DayofweekThursday, DayofweekFriday, DayofweekSaturday:
 		return true
 	}
 	return false
 }
 
-func (e DayOfWeek) String() string {
+func (e Dayofweek) String() string {
 	return string(e)
 }
 
-func (e *DayOfWeek) UnmarshalGQL(v interface{}) error {
+func (e *Dayofweek) UnmarshalGQL(v interface{}) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
 	}
 
-	*e = DayOfWeek(str)
+	*e = Dayofweek(str)
 	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid DayOfWeek", str)
+		return fmt.Errorf("%s is not a valid Dayofweek", str)
 	}
 	return nil
 }
 
-func (e DayOfWeek) MarshalGQL(w io.Writer) {
+func (e Dayofweek) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

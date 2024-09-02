@@ -1,0 +1,17 @@
+type User {
+  userid: ID!
+  name: String!
+  todos: [Todo]
+}
+
+input NewUser {
+  name: String!
+}
+
+extend type Query {
+  user(userid: ID!): User
+}
+
+extend type Mutation {
+  registerUser(input: NewUser!): User!
+}
