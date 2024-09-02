@@ -73,8 +73,6 @@ func CreateTodoHandler(db *gorm.DB) http.HandlerFunc {
         }
         todo := models.Todo{
 			Title:     newTodo.Title,
-			SubjectID: newTodo.SubjectID,
-			UserID:    newTodo.UserID,
         }
         if err := db.Create(&todo).Error; err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
