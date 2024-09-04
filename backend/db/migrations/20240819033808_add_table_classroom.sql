@@ -1,7 +1,7 @@
 -- +goose Up
 CREATE TABLE classrooms (
     ClassroomID BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    ClassroomNAme VARCHAR(255));
+    ClassroomName VARCHAR(255));
 -- +goose StatementBegin
 SELECT 'up SQL query';
 -- +goose StatementEnd

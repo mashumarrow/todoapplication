@@ -25,7 +25,7 @@ func (r *mutationResolver) CreateClassroom(ctx context.Context, input model.NewC
 	
 	}
 
-	if err := r.DB.Create(classroom).Error; err != nil {
+	if err := r.DB.Table("classrooms").Create(classroom).Error; err != nil {
 		return nil, err
 	}
 

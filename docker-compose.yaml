@@ -15,11 +15,11 @@ services:
       - db
 
   db:
-    image: mysql:latest
+    image: mysql:8.0
     container_name: mysql-db #コンテナ名を指定
     environment: # 環境変数を指定
       MYSQL_DATABASE: schedule_todo
-      MYSQL_ROOT_PASSWORD: yourpassword
+      MYSQL_ROOT_PASSWORD: ata
       TZ: "Asia/Tokyo" # タイムゾーンを指定
     ports:
       - "3300:3306"
@@ -28,4 +28,4 @@ services:
       interval: 10s # チェック間隔
       timeout: 5s # タイムアウト
       retries: 3 # リトライ回数
-     
+
