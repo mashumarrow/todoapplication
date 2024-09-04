@@ -2,7 +2,7 @@ type Todo {
   userid: ID!
   title: String!
   completed: Boolean!
-  subject: Subject!
+  subjectid: ID
 }
 
 input NewTodo {

@@ -52,18 +52,35 @@ func (r *scheduleResolver) Userid(ctx context.Context, obj *models.Schedule) (st
 	return fmt.Sprintf("%d", obj.UserID), nil
 }
 
+// Subjectid is the resolver for the subjectid field.
+func (r *scheduleResolver) Subjectid(ctx context.Context, obj *models.Schedule) (*string, error) {
+	panic(fmt.Errorf("not implemented: Subjectid - subjectid"))
+}
+
+// Classroom is the resolver for the classroom field.
+func (r *scheduleResolver) Classroom(ctx context.Context, obj *models.Schedule) (*models.Classroom, error) {
+	panic(fmt.Errorf("not implemented: Classroom - classroom"))
+}
+
 // Dayofweek is the resolver for the dayofweek field.
 func (r *scheduleResolver) Dayofweek(ctx context.Context, obj *models.Schedule) (model.Dayofweek, error) {
 	return model.Dayofweek(obj.DayOfWeek), nil
-}
-
-// Todo is the resolver for the todo field.
-func (r *scheduleResolver) Todo(ctx context.Context, obj *models.Schedule) (*models.Todo, error) {
-	
-
 }
 
 // Schedule returns graph.ScheduleResolver implementation.
 func (r *Resolver) Schedule() graph.ScheduleResolver { return &scheduleResolver{r} }
 
 type scheduleResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *scheduleResolver) Subject(ctx context.Context, obj *models.Schedule) (*models.Subject, error) {
+	panic(fmt.Errorf("not implemented: Subject - subject"))
+}
+func (r *scheduleResolver) Todo(ctx context.Context, obj *models.Schedule) (*models.Todo, error) {
+	panic(fmt.Errorf("not implemented: Todo - todo"))
+}

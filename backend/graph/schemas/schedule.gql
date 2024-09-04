@@ -1,10 +1,9 @@
 type Schedule {
   userid: ID!
-  subject: Subject!
+  subjectid: ID
   classroom: Classroom!
   dayofweek: Dayofweek!
   period: Int!
-  todo: Todo
 }
 
 enum Dayofweek {

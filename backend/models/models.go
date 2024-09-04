@@ -3,8 +3,6 @@ package models
 type User struct {
 	UserID string `gorm:"column:UserID;primaryKey;autoIncrement"`
 	Name   string `gorm:"column:Name"`
-	Email  string `gorm:"column:Email"`
-	Todos  []Todo `gorm:"column:Todos"`
 }
 
 type NewTodo struct {
@@ -23,18 +21,17 @@ type Classroom struct {
 }
 
 type Schedule struct {
-	UserID      uint      `gorm:"column:UserID;primaryKey;autoIncrement"`
+	UserID      uint      `gorm:"column:UserID;primaryKey"`
 	DayOfWeek   string    `gorm:"column:DayOfWeek"`
 	Period      int       `gorm:"column:Period"`
-	Subject     Subject    `gorm:"foreignKey:SubjectID"`
-	Classroom   Classroom `gorm:"foreignKey:ClassroomID"`
+	SubjectID   uint     `gorm:"column:SubjectID"`
+	ClassroomID  uint    `gorm:"column:ClassroomID"`
 }
 
 type Todo struct {
-	SubjectID uint    `json:"subjectId"`
-	Title     string  `json:"title"`
-	Completed bool    `json:"completed"`
-	Subject   Subject `json:"subject"`
-	UserID    uint    `json:"userId"`
-	User      User    `json:"user"`
+	SubjectID uint    `gorm:"column:SubjectID"`
+	Title     string  `gorm:"column:Title"`
+	Completed bool    `gorm:"column:Completed"`
+	UserID    uint    `gorm:"column:UserID"`
+	
 }
