@@ -1,7 +1,6 @@
 type Subject {
   subjectid: ID!
   subjectname: String!
-  todos: [Todo]
 }
 
 input NewSubject {

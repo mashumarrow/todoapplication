@@ -20,7 +20,7 @@ func (r *mutationResolver) CreateSubject(ctx context.Context, input model.NewSub
 	
 	}
 
-	if err := r.DB.Create(subject).Error; err != nil {
+	if err := r.DB.Table("subjects").Create(subject).Error; err != nil {
 		return nil, err
 	}
 
@@ -51,13 +51,13 @@ func (r *queryResolver) Subject(ctx context.Context, subjectid *string) (*models
 
 // Subjectid is the resolver for the subjectid field.
 func (r *subjectResolver) Subjectid(ctx context.Context, obj *models.Subject) (string, error) {
-	panic(fmt.Errorf("not implemented: Subjectid - subjectid"))
+	return fmt.Sprintf("%d", obj.SubjectID), nil
 }
 
-// Todos is the resolver for the todos field.
-func (r *subjectResolver) Todos(ctx context.Context, obj *models.Subject) ([]*models.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
-}
+// // Todos is the resolver for the todos field.
+// func (r *subjectResolver) Todos(ctx context.Context, obj *models.Subject) ([]*models.Todo, error) {
+// 	panic(fmt.Errorf("not implemented: Todos - todos"))
+// }
 
 // Subject returns graph.SubjectResolver implementation.
 func (r *Resolver) Subject() graph.SubjectResolver { return &subjectResolver{r} }

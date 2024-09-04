@@ -6,7 +6,7 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
+	  "fmt"
 
 	"github.com/mashumarrow/todoapplication/backend/graph"
 	"github.com/mashumarrow/todoapplication/backend/graph/model"
@@ -51,12 +51,12 @@ func (r *queryResolver) Schedule(ctx context.Context, userid string) (*models.Sc
 
 // Userid is the resolver for the userid field.
 func (r *scheduleResolver) Userid(ctx context.Context, obj *models.Schedule) (string, error) {
-	panic(fmt.Errorf("not implemented: Userid - userid"))
+	return fmt.Sprintf("%d", obj.UserID), nil
 }
 
 // Dayofweek is the resolver for the dayofweek field.
 func (r *scheduleResolver) Dayofweek(ctx context.Context, obj *models.Schedule) (model.Dayofweek, error) {
-	panic(fmt.Errorf("not implemented: Dayofweek - dayofweek"))
+	return model.Dayofweek(obj.DayOfWeek), nil
 }
 
 // Todo is the resolver for the todo field.
