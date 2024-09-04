@@ -7,7 +7,6 @@ package resolvers
 import (
 	"context"
 	"fmt"
-	
 
 	"github.com/mashumarrow/todoapplication/backend/graph"
 	"github.com/mashumarrow/todoapplication/backend/models"
@@ -15,8 +14,8 @@ import (
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input models.NewTodo) (*models.Todo, error) {
-   todo := &models.Todo{
-		Title:  input.Title,
+	todo := &models.Todo{
+		Title:     input.Title,
 		UserID:    input.UserID,
 		SubjectID: input.SubjectID,
 	}
@@ -27,7 +26,6 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input models.NewTodo)
 
 	return todo, nil
 }
-
 
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*models.Todo, error) {
@@ -44,9 +42,9 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*models.Todo, error) {
 func (r *queryResolver) Todo(ctx context.Context, userid string) (*models.Todo, error) {
 	var todo models.Todo
 	if err := r.DB.Where("user_id = ?", userid).First(&todo).Error; err != nil {
-        return nil, err
-    }
-    return &todo, nil
+		return nil, err
+	}
+	return &todo, nil
 }
 
 // Userid is the resolver for the userid field.

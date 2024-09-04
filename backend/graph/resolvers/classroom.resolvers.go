@@ -20,9 +20,8 @@ func (r *classroomResolver) Classroomid(ctx context.Context, obj *models.Classro
 
 // CreateClassroom is the resolver for the createClassroom field.
 func (r *mutationResolver) CreateClassroom(ctx context.Context, input model.NewClassroom) (*models.Classroom, error) {
-	classroom:= &models.Classroom{
-		ClassroomName:  input.Classroomname,
-	
+	classroom := &models.Classroom{
+		ClassroomName: input.Classroomname,
 	}
 
 	if err := r.DB.Table("classrooms").Create(classroom).Error; err != nil {
@@ -30,28 +29,26 @@ func (r *mutationResolver) CreateClassroom(ctx context.Context, input model.NewC
 	}
 
 	return classroom, nil
-
 }
 
 // Classrooms is the resolver for the classrooms field.
 func (r *queryResolver) Classrooms(ctx context.Context) ([]*models.Classroom, error) {
 	var classrooms []*models.Classroom
-	
-		if err := r.DB.Find(&classrooms).Error; err != nil {
-			return nil, err
-		}
-	
-		return classrooms, nil
 
+	if err := r.DB.Find(&classrooms).Error; err != nil {
+		return nil, err
+	}
+
+	return classrooms, nil
 }
 
 // Classroom is the resolver for the classroom field.
 func (r *queryResolver) Classroom(ctx context.Context, classroomid string) (*models.Classroom, error) {
 	var classroom models.Classroom
 	if err := r.DB.Find(&classroom).Error; err != nil {
-        return nil, err
-    }
-    return &classroom, nil
+		return nil, err
+	}
+	return &classroom, nil
 }
 
 // Classroom returns graph.ClassroomResolver implementation.

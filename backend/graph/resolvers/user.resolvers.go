@@ -6,7 +6,6 @@ package resolvers
 
 import (
 	"context"
-	
 
 	"github.com/mashumarrow/todoapplication/backend/graph/model"
 	"github.com/mashumarrow/todoapplication/backend/models"
@@ -15,8 +14,7 @@ import (
 // RegisterUser is the resolver for the registerUser field.
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.NewUser) (*models.User, error) {
 	user := &models.User{
-		Name:  input.Name,
-		
+		Name: input.Name,
 	}
 
 	if err := r.DB.Create(user).Error; err != nil {
@@ -24,8 +22,6 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.NewUser
 	}
 
 	return user, nil
-
-	
 }
 
 // User is the resolver for the user field.
@@ -35,5 +31,4 @@ func (r *queryResolver) User(ctx context.Context, userid string) (*models.User, 
 		return nil, err
 	}
 	return &user, nil
-
 }

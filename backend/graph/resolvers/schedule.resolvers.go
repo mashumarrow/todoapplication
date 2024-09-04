@@ -6,7 +6,7 @@ package resolvers
 
 import (
 	"context"
-	  "fmt"
+	"fmt"
 
 	"github.com/mashumarrow/todoapplication/backend/graph"
 	"github.com/mashumarrow/todoapplication/backend/graph/model"
@@ -15,9 +15,9 @@ import (
 
 // Createschedule is the resolver for the createschedule field.
 func (r *mutationResolver) Createschedule(ctx context.Context, input model.NewSchedule) (*models.Schedule, error) {
-	schedule:= &models.Schedule{
-		DayOfWeek:  string(input.Dayofweek),
-		Period: input.Period,
+	schedule := &models.Schedule{
+		DayOfWeek: string(input.Dayofweek),
+		Period:    input.Period,
 	}
 
 	if err := r.DB.Create(schedule).Error; err != nil {
@@ -25,28 +25,26 @@ func (r *mutationResolver) Createschedule(ctx context.Context, input model.NewSc
 	}
 
 	return schedule, nil
-
 }
 
 // Schedules is the resolver for the schedules field.
 func (r *queryResolver) Schedules(ctx context.Context) ([]*models.Schedule, error) {
 	var schedules []*models.Schedule
-	
-		if err := r.DB.Find(&schedules).Error; err != nil {
-			return nil, err
-		}
-	
-		return schedules, nil
 
+	if err := r.DB.Find(&schedules).Error; err != nil {
+		return nil, err
+	}
+
+	return schedules, nil
 }
 
 // Schedule is the resolver for the schedule field.
 func (r *queryResolver) Schedule(ctx context.Context, userid string) (*models.Schedule, error) {
 	var schedule models.Schedule
 	if err := r.DB.Where("user_id = ?", userid).First(&schedule).Error; err != nil {
-        return nil, err
-    }
-    return &schedule, nil
+		return nil, err
+	}
+	return &schedule, nil
 }
 
 // Userid is the resolver for the userid field.
@@ -61,7 +59,8 @@ func (r *scheduleResolver) Dayofweek(ctx context.Context, obj *models.Schedule) 
 
 // Todo is the resolver for the todo field.
 func (r *scheduleResolver) Todo(ctx context.Context, obj *models.Schedule) (*models.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todo - todo"))
+	
+
 }
 
 // Schedule returns graph.ScheduleResolver implementation.
