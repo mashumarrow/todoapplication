@@ -13,6 +13,7 @@ type NewTodo struct {
 type Subject struct {
 	SubjectID   uint   `gorm:"column:SubjectID;primaryKey;autoIncrement"`
 	SubjectName string `gorm:"column:SubjectName"`
+	Todos       []Todo `gorm:"foreignKey:SubjectID"`
 }
 
 type Classroom struct {
@@ -21,11 +22,11 @@ type Classroom struct {
 }
 
 type Schedule struct {
-	UserID      uint      `gorm:"column:UserID;primaryKey"`
-	DayOfWeek   string    `gorm:"column:DayOfWeek"`
-	Period      int       `gorm:"column:Period"`
-	SubjectID   uint     `gorm:"column:SubjectID"`
-	ClassroomID  uint    `gorm:"column:ClassroomID"`
+	UserID      uint   `gorm:"column:UserID;primaryKey"`
+	DayOfWeek   string `gorm:"column:DayOfWeek"`
+	Period      int    `gorm:"column:Period"`
+	SubjectID   uint   `gorm:"column:SubjectID"`
+	ClassroomID uint   `gorm:"column:ClassroomID"`
 }
 
 type Todo struct {
@@ -33,5 +34,6 @@ type Todo struct {
 	Title     string  `gorm:"column:Title"`
 	Completed bool    `gorm:"column:Completed"`
 	UserID    uint    `gorm:"column:UserID"`
-	
+	User      User    `gorm:"foreignKey:UserID"`
+	Subject   Subject `gorm:"foreignKey:SubjectID"`
 }

@@ -7,6 +7,7 @@ package resolvers
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/mashumarrow/todoapplication/backend/graph"
 	"github.com/mashumarrow/todoapplication/backend/models"
@@ -49,18 +50,50 @@ func (r *queryResolver) Todo(ctx context.Context, userid string) (*models.Todo, 
 
 // Userid is the resolver for the userid field.
 func (r *todoResolver) Userid(ctx context.Context, obj *models.Todo) (string, error) {
-	panic(fmt.Errorf("not implemented: Userid - userid"))
+	return fmt.Sprintf("%d", obj.UserID), nil
 }
 
 // Subjectid is the resolver for the subjectid field.
 func (r *todoResolver) Subjectid(ctx context.Context, obj *models.Todo) (*string, error) {
-	panic(fmt.Errorf("not implemented: Subjectid - subjectid"))
+	subjectID := fmt.Sprintf("%d", obj.SubjectID)
+	return &subjectID, nil
+}
+
+// Userid is the resolver for the userid field.
+func (r *newTodoResolver) Userid(ctx context.Context, obj *models.NewTodo, data string) error {
+	userID, err := strconv.ParseUint(data, 10, 32)
+    if err != nil {
+        return fmt.Errorf("failed to convert string to uint: %w", err)
+    }
+
+    obj.UserID = uint(userID) // 変換したuintをUserIDに設定
+    return nil
+}
+
+// Subjectid is the resolver for the subjectid field.
+func (r *newTodoResolver) Subjectid(ctx context.Context, obj *models.NewTodo, data *string) error {
+	if data == nil {
+        return fmt.Errorf("subject ID is nil")
+    }
+
+    // string型のdataをuintに変換
+    subjectID, err := strconv.ParseUint(*data, 10, 32)
+    if err != nil {
+        return fmt.Errorf("failed to convert string to uint: %w", err)
+    }
+
+    obj.SubjectID = uint(subjectID) // 変換したuintをSubjectIDに設定
+    return nil
 }
 
 // Todo returns graph.TodoResolver implementation.
 func (r *Resolver) Todo() graph.TodoResolver { return &todoResolver{r} }
 
+// NewTodo returns graph.NewTodoResolver implementation.
+func (r *Resolver) NewTodo() graph.NewTodoResolver { return &newTodoResolver{r} }
+
 type todoResolver struct{ *Resolver }
+type newTodoResolver struct{ *Resolver }
 
 // !!! WARNING !!!
 // The code below was going to be deleted when updating resolvers. It has been copied here so you have
@@ -69,5 +102,11 @@ type todoResolver struct{ *Resolver }
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
 func (r *todoResolver) Subject(ctx context.Context, obj *models.Todo) (*models.Subject, error) {
-	panic(fmt.Errorf("not implemented: Subject - subject"))
+	var subject models.Subject
+
+	if err := r.DB.First(&subject, "SubjectID = ?", obj.SubjectID).Error; err != nil {
+		return nil, fmt.Errorf("failed to load subject: %w", err)
+	}
+
+	return &subject, nil
 }

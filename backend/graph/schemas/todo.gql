@@ -7,6 +7,8 @@ type Todo {
 
 input NewTodo {
   title: String!
+  userid: ID!
+  subjectid: ID
 }
 extend type Query {
   todos: [Todo!]!

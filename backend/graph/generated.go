@@ -46,6 +46,7 @@ type ResolverRoot interface {
 	Schedule() ScheduleResolver
 	Subject() SubjectResolver
 	Todo() TodoResolver
+	NewTodo() NewTodoResolver
 }
 
 type DirectiveRoot struct {
@@ -137,6 +138,11 @@ type TodoResolver interface {
 	Userid(ctx context.Context, obj *models.Todo) (string, error)
 
 	Subjectid(ctx context.Context, obj *models.Todo) (*string, error)
+}
+
+type NewTodoResolver interface {
+	Userid(ctx context.Context, obj *models.NewTodo, data string) error
+	Subjectid(ctx context.Context, obj *models.NewTodo, data *string) error
 }
 
 type executableSchema struct {
@@ -4241,7 +4247,7 @@ func (ec *executionContext) unmarshalInputNewTodo(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title"}
+	fieldsInOrder := [...]string{"title", "userid", "subjectid"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4255,6 +4261,24 @@ func (ec *executionContext) unmarshalInputNewTodo(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Title = data
+		case "userid":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userid"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.NewTodo().Userid(ctx, &it, data); err != nil {
+				return it, err
+			}
+		case "subjectid":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subjectid"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.NewTodo().Subjectid(ctx, &it, data); err != nil {
+				return it, err
+			}
 		}
 	}
 
