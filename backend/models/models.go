@@ -3,6 +3,7 @@ package models
 type User struct {
 	UserID string `gorm:"column:UserID;primaryKey;autoIncrement"`
 	Name   string `gorm:"column:Name"`
+	Password   string `gorm:"column:Password"`
 }
 
 type NewTodo struct {

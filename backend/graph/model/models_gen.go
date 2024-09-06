@@ -25,7 +25,9 @@ type NewSubject struct {
 }
 
 type NewUser struct {
-	Name string `json:"name"`
+	Userid   string `json:"userid"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
 }
 
 type Query struct {

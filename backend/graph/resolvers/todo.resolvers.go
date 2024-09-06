@@ -62,28 +62,28 @@ func (r *todoResolver) Subjectid(ctx context.Context, obj *models.Todo) (*string
 // Userid is the resolver for the userid field.
 func (r *newTodoResolver) Userid(ctx context.Context, obj *models.NewTodo, data string) error {
 	userID, err := strconv.ParseUint(data, 10, 32)
-    if err != nil {
-        return fmt.Errorf("failed to convert string to uint: %w", err)
-    }
+	if err != nil {
+		return fmt.Errorf("failed to convert string to uint: %w", err)
+	}
 
-    obj.UserID = uint(userID) // 変換したuintをUserIDに設定
-    return nil
+	obj.UserID = uint(userID) // 変換したuintをUserIDに設定
+	return nil
 }
 
 // Subjectid is the resolver for the subjectid field.
 func (r *newTodoResolver) Subjectid(ctx context.Context, obj *models.NewTodo, data *string) error {
 	if data == nil {
-        return fmt.Errorf("subject ID is nil")
-    }
+		return fmt.Errorf("subject ID is nil")
+	}
 
-    // string型のdataをuintに変換
-    subjectID, err := strconv.ParseUint(*data, 10, 32)
-    if err != nil {
-        return fmt.Errorf("failed to convert string to uint: %w", err)
-    }
+	// string型のdataをuintに変換
+	subjectID, err := strconv.ParseUint(*data, 10, 32)
+	if err != nil {
+		return fmt.Errorf("failed to convert string to uint: %w", err)
+	}
 
-    obj.SubjectID = uint(subjectID) // 変換したuintをSubjectIDに設定
-    return nil
+	obj.SubjectID = uint(subjectID) // 変換したuintをSubjectIDに設定
+	return nil
 }
 
 // Todo returns graph.TodoResolver implementation.

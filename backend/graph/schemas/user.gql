@@ -1,13 +1,17 @@
 type User {
   userid: ID!
   name: String!
+  password: String!
 }
 
 input NewUser {
+  userid: ID!
   name: String!
+  password: String!
 }
 
 extend type Query {
+  users: [User]
   user(userid: ID!): User
 }
 
