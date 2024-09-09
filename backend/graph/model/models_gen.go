@@ -25,7 +25,6 @@ type NewSubject struct {
 }
 
 type NewUser struct {
-	Userid   string `json:"userid"`
 	Name     string `json:"name"`
 	Password string `json:"password"`
 }

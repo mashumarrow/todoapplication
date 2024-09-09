@@ -15,8 +15,7 @@ import (
 // RegisterUser is the resolver for the registerUser field.
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.NewUser) (*models.User, error) {
 	user := &models.User{
-		UserID: input.Userid,
-		Name: input.Name,
+		Name:     input.Name,
 		Password: input.Password,
 	}
 
@@ -30,13 +29,14 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.NewUser
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*models.User, error) {
 	var users []*models.User
-    
-    if err := r.DB.Find(&users).Error; err != nil {
-        return nil, fmt.Errorf("failed to retrieve users: %w", err)
-    }
 
-    return users, nil
+	if err := r.DB.Find(&users).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve users: %w", err)
+	}
+
+	return users, nil
 }
+
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, userid string) (*models.User, error) {
 	var user models.User

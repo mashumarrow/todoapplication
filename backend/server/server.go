@@ -3,6 +3,9 @@ package server
 import (
     "log"
     "net/http"
+    
+    "github.com/rs/cors"
+    //"github.com/gorilla/mux"
     "github.com/mashumarrow/todoapplication/backend/handlers"
     "gorm.io/gorm"
 )
@@ -21,8 +24,18 @@ func NewServer(db *gorm.DB, port string) *Server {
 
 func (s *Server) Start() {
     mux := http.NewServeMux()
+
+     // CORS設定
+     c := cors.New(cors.Options{
+        AllowedOrigins:   []string{"http://localhost:3000"}, 
+        AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+        AllowCredentials: true,
+    })
+   
+    mux.Handle("/graphql", handler.NewGraphQLHandler(s.DB))
+   
+
     mux.Handle("/playground", handler.NewPlaygroundHandler())
-    mux.Handle("/query", handler.NewGraphQLHandler(s.DB))
     mux.HandleFunc("/users", handler.CreateUserHandler(s.DB))
     mux.HandleFunc("/users/get", handler.GetUserHandler(s.DB))
     mux.HandleFunc("/todos", handler.CreateTodoHandler(s.DB))
@@ -30,6 +43,6 @@ func (s *Server) Start() {
     mux.HandleFunc("/subjects", handler.CreateSubjectHandler(s.DB))
     mux.HandleFunc("/subjects/get", handler.GetSubjectsHandler(s.DB))
 
-    log.Printf("サーバーが起動しました: http://localhost:%s/playground", s.Port)
-    log.Fatal(http.ListenAndServe(":"+s.Port, mux))
+    log.Printf("サーバーが起動しました: http://localhost:%s/graphql", s.Port)
+    log.Fatal(http.ListenAndServe(":"+s.Port, c.Handler(mux))) 
 }
