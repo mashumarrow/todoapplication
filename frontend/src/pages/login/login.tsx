@@ -1,50 +1,63 @@
-import React {useState} from 'react';
-import {useMutation, gql} from '@apollo/client'
+import React, { useState, useEffect } from "react";
+import { useMutation, gql } from "@apollo/client";
+import dynamic from "next/dynamic";
 
+// GraphQL ミューテーション
 const REGISTER_USER = gql`
-    RegisterUser($input: NewUser!) {
+  mutation RegisterUser($input: NewUser!) {
     registerUser(input: $input) {
-      userid
       name
+      password
     }
   }
 `;
 
-const GET_USERS = gql`
-  query Users {
-    users {
-      userid
-      name
-    }
-  }
-`;
 const Login: React.FC = () => {
-    const [userid, setUserid] = useState('');
-    const [name, setName] = useState('');
-    const [password, setPassword] = useState('');
-    const [registerUser] = useMutation(REGISTER_USER, {
-      refetchQueries: [{ query: GET_USERS }], // 新しいユーザーを登録後にユーザー一覧を再取得
-    });
-    const { loading, error, data } = useQuery(GET_USERS);
-  
-    const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      try {
-        await registerUser({
-          variables: {
-            input: { userid, name, password },
-          },
-        });
-        setUserid('');
-        setName('');
-        setPassword('');
-      } catch (err) {
-        console.error('Failed to register user', err);
-      }
-    };
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [clientReady, setClientReady] = useState(false); // クライアント側のみでApollo操作を行うためのフラグ
 
-    return(
-        <div>
+  const [registerUser] = useMutation(REGISTER_USER);
 
-        </div>
-    );}
+  useEffect(() => {
+    // クライアントサイドでフラグをセット
+    setClientReady(true);
+  }, []);
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!clientReady) return; // サーバーサイドでの実行を防ぐ
+
+    try {
+      await registerUser({
+        variables: {
+          input: { name, password },
+        },
+      });
+      setName("");
+      setPassword("");
+    } catch (err) {
+      console.error("Failed to register user", err);
+    }
+  };
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Login functionality not yet implemented.");
+    // ここにログイン処理を実装
+  };
+
+  return (
+    <div className="min-h-screen flex">
+      {/* カラーバー */}
+      <div className="w-1/3 bg-gray-400"></div>
+      <div className="w-1/3 bg-pink-200"></div>
+      <div className="w-1/3 bg-cream-200"></div>
+
+     
+    </div>
+  );
+};
+
+// dynamicを使ってSSRを無効にする
+export default dynamic(() => Promise.resolve(Login), { ssr: false });
