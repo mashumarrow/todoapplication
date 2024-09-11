@@ -1,0 +1,19 @@
+type User {
+  userid: ID!
+  name: String!
+  password: String!
+}
+
+input NewUser {
+  name: String!
+  password: String!
+}
+
+extend type Query {
+  users: [User]
+  user(userid: ID!): User
+}
+
+extend type Mutation {
+  registerUser(input: NewUser!): User!
+}

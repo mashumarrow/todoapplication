@@ -1,0 +1,17 @@
+type Subject {
+  subjectid: ID!
+  subjectname: String!
+}
+
+input NewSubject {
+  subjectname: String!
+}
+
+extend type Query {
+  subjects: [Subject!]!
+  subject(subjectid: ID): Subject!
+}
+
+extend type Mutation {
+  createSubject(input: NewSubject!): Subject!
+}

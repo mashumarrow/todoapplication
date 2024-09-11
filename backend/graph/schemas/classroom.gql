@@ -1,0 +1,17 @@
+type Classroom {
+  classroomid: ID!
+  classroomname: String!
+}
+
+input NewClassroom {
+  classroomname: String!
+}
+
+extend type Query {
+  classrooms: [Classroom!]!
+  classroom(classroomid: ID!): Classroom!
+}
+
+extend type Mutation {
+  createClassroom(input: NewClassroom!): Classroom!
+}
