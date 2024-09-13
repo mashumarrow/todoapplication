@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "gen": "graphql-codegen --config ./src/graphql/codegen-client.yml",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

@@ -1,0 +1,14 @@
+query users {
+  users {
+    userid
+    name
+    password
+  }
+}
+
+mutation RegisterUser($input: NewUser!) {
+  registerUser(input: $input) {
+    name
+    password
+  }
+}
