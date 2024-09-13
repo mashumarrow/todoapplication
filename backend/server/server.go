@@ -29,19 +29,19 @@ func (s *Server) Start() {
      c := cors.New(cors.Options{
         AllowedOrigins:   []string{"http://localhost:3000"}, 
         AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
-        AllowCredentials: true,
+        AllowedHeaders:   []string{"Authorization", "Content-Type"},
     })
    
     mux.Handle("/graphql", handler.NewGraphQLHandler(s.DB))
    
 
-    mux.Handle("/playground", handler.NewPlaygroundHandler())
-    mux.HandleFunc("/users", handler.CreateUserHandler(s.DB))
-    mux.HandleFunc("/users/get", handler.GetUserHandler(s.DB))
-    mux.HandleFunc("/todos", handler.CreateTodoHandler(s.DB))
-    mux.HandleFunc("/todos/get", handler.GetTodosHandler(s.DB))
-    mux.HandleFunc("/subjects", handler.CreateSubjectHandler(s.DB))
-    mux.HandleFunc("/subjects/get", handler.GetSubjectsHandler(s.DB))
+    //mux.Handle("/playground", handler.NewPlaygroundHandler())
+    // mux.HandleFunc("/users", handler.CreateUserHandler(s.DB))
+    // mux.HandleFunc("/users/get", handler.GetUserHandler(s.DB))
+    // mux.HandleFunc("/todos", handler.CreateTodoHandler(s.DB))
+    // mux.HandleFunc("/todos/get", handler.GetTodosHandler(s.DB))
+    // mux.HandleFunc("/subjects", handler.CreateSubjectHandler(s.DB))
+    // mux.HandleFunc("/subjects/get", handler.GetSubjectsHandler(s.DB))
 
     log.Printf("サーバーが起動しました: http://localhost:%s/graphql", s.Port)
     log.Fatal(http.ListenAndServe(":"+s.Port, c.Handler(mux))) 

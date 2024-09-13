@@ -32,6 +32,7 @@ func NewPlaygroundHandler() http.Handler {
 //新しいユーザー作成
 func CreateUserHandler(db *gorm.DB) http.HandlerFunc{
     return func(w http.ResponseWriter, r *http.Request){
+        
         var user models.User
         if err := json.NewDecoder(r.Body).Decode(&user); err != nil{
             http.Error(w, err.Error(), http.StatusBadRequest)
