@@ -7,6 +7,7 @@ package resolvers
 import (
 	"context"
 	"fmt"
+	"github.com/mashumarrow/todoapplication/backend/db"
 
 	"github.com/mashumarrow/todoapplication/backend/graph/model"
 	"github.com/mashumarrow/todoapplication/backend/models"
@@ -44,4 +45,21 @@ func (r *queryResolver) User(ctx context.Context, userid string) (*models.User, 
 		return nil, err
 	}
 	return &user, nil
+}
+
+// LoginUser is the resolver for the loginUser field.
+func (r *queryResolver) LoginUser(ctx context.Context, name string, password string) (*models.User, error) {
+	// データベースからユーザーを取得
+	user, err := db.GetUserByName(ctx, name)
+	if err != nil {
+		return nil, fmt.Errorf("ユーザーの取得に失敗しました: %v", err)
+	}
+
+	// パスワードの照合
+	if user.Password != password {
+		return nil, fmt.Errorf("パスワードが一致しません")
+	}
+
+	// ログイン成功
+	return user, nil
 }

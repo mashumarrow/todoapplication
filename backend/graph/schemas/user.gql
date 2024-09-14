@@ -12,6 +12,7 @@ input NewUser {
 extend type Query {
   users: [User]
   user(userid: ID!): User
+  loginUser(name: String!, password: String!): User
 }
 
 extend type Mutation {
