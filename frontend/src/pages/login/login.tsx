@@ -53,8 +53,6 @@ const Login: React.FC = () => {
       <div className="w-1/3 bg-gray-400"></div>
       <div className="w-1/3 bg-pink-200"></div>
       <div className="w-1/3 bg-cream-200"></div>
-
-     
     </div>
   );
 };
