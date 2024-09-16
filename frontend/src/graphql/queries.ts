@@ -18,3 +18,32 @@ export const LOGIN_USER = gql`
     }
   }
 `;
+
+export const CREATE_SCHEDULE = gql`
+  mutation createschedule($input: NewSchedule!) {
+    createschedule(input: $input) {
+      userid
+      subjectid
+      classroom {
+        classroomid
+        classname
+      }
+      dayofweek
+      period
+    }
+  }
+`;
+
+export const GET_SCHEDULES = gql`
+  query GetSchedules {
+    schedules {
+      userid
+      subjectid
+      classroom {
+        name
+      }
+      dayofweek
+      period
+    }
+  }
+`;
