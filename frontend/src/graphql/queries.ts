@@ -24,10 +24,9 @@ export const CREATE_SCHEDULE = gql`
     createschedule(input: $input) {
       userid
       subjectid
-      classroom {
-        classroomid
-        classname
-      }
+      subjectname
+      classroomid
+      classroomname
       dayofweek
       period
     }
@@ -39,11 +38,20 @@ export const GET_SCHEDULES = gql`
     schedules {
       userid
       subjectid
-      classroom {
-        name
-      }
+      subjectname
+      classroomname
+      classroomid
       dayofweek
       period
+    }
+  }
+`;
+
+export const GET_SUBJECTS = gql`
+  query GetSubjects {
+    subjects {
+      subjectid
+      subjectname
     }
   }
 `;

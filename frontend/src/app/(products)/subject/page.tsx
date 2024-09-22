@@ -1,11 +1,11 @@
-"use client";
+"use client"; // 必須
 
 import React, { useState, useEffect } from "react";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery, ApolloError } from "@apollo/client";
 import { CREATE_SCHEDULE, GET_SCHEDULES } from "../../../graphql/queries";
 
 type ScheduleEntry = {
-  subjectid: string;
+  subject: string;
   classroom: string;
 };
 
@@ -23,41 +23,56 @@ export default function TimeTable() {
     dayofweek: string;
     period: number;
   }>({ dayofweek: "", period: 0 });
-  const [subjectid, setSubjectid] = useState("");
+  const [subject, setSubject] = useState("");
   const [classroom, setClassroom] = useState("");
 
   // Apollo Client: データ取得
-  const { data, refetch } = useQuery(GET_SCHEDULES);
+  const { data: scheduleData, refetch } = useQuery(GET_SCHEDULES);
 
   // Apollo Client: ミューテーション
-  const [createSchedule] = useMutation(CREATE_SCHEDULE);
+  const [createSchedule] = useMutation(CREATE_SCHEDULE, {
+    update(cache, { data: { createschedule } }) {
+      // キャッシュを手動で更新
+      const existingSchedules: any = cache.readQuery({ query: GET_SCHEDULES });
+      const newScheduleEntry = createschedule;
+
+      cache.writeQuery({
+        query: GET_SCHEDULES,
+        data: {
+          schedules: [...existingSchedules.schedules, newScheduleEntry],
+        },
+      });
+    },
+  });
 
   useEffect(() => {
-    if (data && data.schedules) {
+    if (scheduleData && scheduleData.schedules) {
       const newSchedule: Schedule = {};
-      data.schedules.forEach(
+
+      scheduleData.schedules.forEach(
         (item: {
           dayofweek: string;
           period: number;
-          subjectid: string;
-          classroom: { name: string };
+          subjectname: string;
+          classroomname: string;
         }) => {
           const key = `${item.dayofweek}${item.period}`;
           newSchedule[key] = {
-            subjectid: item.subjectid,
-            classroom: item.classroom.name,
+            subject: item.subjectname,
+            classroom: item.classroomname,
           };
         }
       );
+
       setSchedule(newSchedule);
     }
-  }, [data]);
+  }, [scheduleData]);
 
   // モーダルを開く関数
   const openModal = (dayofweek: string, period: number) => {
     setSelectedCell({ dayofweek, period });
     const key = `${dayofweek}${period}`;
-    setSubjectid(schedule[key]?.subjectid || "");
+    setSubject(schedule[key]?.subject || "");
     setClassroom(schedule[key]?.classroom || "");
     setIsModalOpen(true);
   };
@@ -66,35 +81,47 @@ export default function TimeTable() {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedCell({ dayofweek: "", period: 0 });
+    setSubject(""); // フィールドをリセット
+    setClassroom(""); // フィールドをリセット
   };
 
   // スケジュールの更新
   const handleSave = async () => {
     const key = `${selectedCell.dayofweek}${selectedCell.period}`;
 
-    // ミューテーションの実行
     try {
+      // ミューテーションの実行
       await createSchedule({
         variables: {
           input: {
             dayofweek: selectedCell.dayofweek,
             period: parseInt(selectedCell.period.toString(), 10),
+            subjectname: subject,
+            classroomname: classroom,
           },
         },
       });
 
-      // スケジュールの状態を更新
-      setSchedule({
-        ...schedule,
-        [key]: { subjectid, classroom },
-      });
-
-      // データを再取得
-      await refetch();
+      // 手動で状態を更新してセルに反映
+      setSchedule((prevSchedule) => ({
+        ...prevSchedule,
+        [key]: { subject, classroom },
+      }));
 
       closeModal();
     } catch (error) {
-      console.error("Error creating schedule:", error);
+      // errorがApolloErrorかどうかを確認
+      if (error instanceof ApolloError) {
+        if (error.graphQLErrors) {
+          console.error("GraphQL Errors:", error.graphQLErrors);
+        }
+        if (error.networkError) {
+          console.error("Network Error:", error.networkError);
+        }
+      } else {
+        // ApolloError以外のエラーの場合
+        console.error("An unknown error occurred:", error);
+      }
     }
   };
 
@@ -130,6 +157,7 @@ export default function TimeTable() {
                     className="border border-gray-300 w-24 h-24 bg-cream text-center cursor-pointer"
                     onClick={() => openModal(day, period)}
                   >
+                    <div className="text-textbrown">{cellData.subject}</div>
                     <div className="text-textbrown">{cellData.classroom}</div>
                   </td>
                 );
@@ -146,6 +174,15 @@ export default function TimeTable() {
             <h2 className="text-2xl mb-4 text-textbrown">
               {selectedCell.dayofweek} {selectedCell.period}
             </h2>
+            <div className="mb-4">
+              <label className="block text-textbrown mb-2">教科名</label>
+              <input
+                type="text"
+                className="w-full px-3 py-2 border border-gray-300 rounded"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+              />
+            </div>
             <div className="mb-4">
               <label className="block text-textbrown mb-2">教室場所</label>
               <input
