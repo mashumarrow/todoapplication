@@ -1,7 +1,9 @@
 type Schedule {
   userid: ID!
   subjectid: ID
-  classroom: Classroom!
+  subjectname: String
+  classroomid: ID
+  classroomname: String
   dayofweek: Dayofweek!
   period: Int!
 }
@@ -18,6 +20,8 @@ enum Dayofweek {
 input NewSchedule {
   dayofweek: Dayofweek!
   period: Int!
+  subjectname: String!
+  classroomname: String!
 }
 
 extend type Query {

@@ -81,11 +81,13 @@ type ComplexityRoot struct {
 	}
 
 	Schedule struct {
-		Classroom func(childComplexity int) int
-		Dayofweek func(childComplexity int) int
-		Period    func(childComplexity int) int
-		Subjectid func(childComplexity int) int
-		Userid    func(childComplexity int) int
+		ClassroomName func(childComplexity int) int
+		Classroomid   func(childComplexity int) int
+		Dayofweek     func(childComplexity int) int
+		Period        func(childComplexity int) int
+		SubjectName   func(childComplexity int) int
+		Subjectid     func(childComplexity int) int
+		Userid        func(childComplexity int) int
 	}
 
 	Subject struct {
@@ -133,7 +135,9 @@ type QueryResolver interface {
 type ScheduleResolver interface {
 	Userid(ctx context.Context, obj *models.Schedule) (string, error)
 	Subjectid(ctx context.Context, obj *models.Schedule) (*string, error)
-	Classroom(ctx context.Context, obj *models.Schedule) (*models.Classroom, error)
+
+	Classroomid(ctx context.Context, obj *models.Schedule) (*string, error)
+
 	Dayofweek(ctx context.Context, obj *models.Schedule) (model.Dayofweek, error)
 }
 type SubjectResolver interface {
@@ -350,12 +354,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Users(childComplexity), true
 
-	case "Schedule.classroom":
-		if e.complexity.Schedule.Classroom == nil {
+	case "Schedule.classroomname":
+		if e.complexity.Schedule.ClassroomName == nil {
 			break
 		}
 
-		return e.complexity.Schedule.Classroom(childComplexity), true
+		return e.complexity.Schedule.ClassroomName(childComplexity), true
+
+	case "Schedule.classroomid":
+		if e.complexity.Schedule.Classroomid == nil {
+			break
+		}
+
+		return e.complexity.Schedule.Classroomid(childComplexity), true
 
 	case "Schedule.dayofweek":
 		if e.complexity.Schedule.Dayofweek == nil {
@@ -370,6 +381,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Schedule.Period(childComplexity), true
+
+	case "Schedule.subjectname":
+		if e.complexity.Schedule.SubjectName == nil {
+			break
+		}
+
+		return e.complexity.Schedule.SubjectName(childComplexity), true
 
 	case "Schedule.subjectid":
 		if e.complexity.Schedule.Subjectid == nil {
@@ -1000,8 +1018,12 @@ func (ec *executionContext) fieldContext_Mutation_createschedule(ctx context.Con
 				return ec.fieldContext_Schedule_userid(ctx, field)
 			case "subjectid":
 				return ec.fieldContext_Schedule_subjectid(ctx, field)
-			case "classroom":
-				return ec.fieldContext_Schedule_classroom(ctx, field)
+			case "subjectname":
+				return ec.fieldContext_Schedule_subjectname(ctx, field)
+			case "classroomid":
+				return ec.fieldContext_Schedule_classroomid(ctx, field)
+			case "classroomname":
+				return ec.fieldContext_Schedule_classroomname(ctx, field)
 			case "dayofweek":
 				return ec.fieldContext_Schedule_dayofweek(ctx, field)
 			case "period":
@@ -1367,8 +1389,12 @@ func (ec *executionContext) fieldContext_Query_schedules(_ context.Context, fiel
 				return ec.fieldContext_Schedule_userid(ctx, field)
 			case "subjectid":
 				return ec.fieldContext_Schedule_subjectid(ctx, field)
-			case "classroom":
-				return ec.fieldContext_Schedule_classroom(ctx, field)
+			case "subjectname":
+				return ec.fieldContext_Schedule_subjectname(ctx, field)
+			case "classroomid":
+				return ec.fieldContext_Schedule_classroomid(ctx, field)
+			case "classroomname":
+				return ec.fieldContext_Schedule_classroomname(ctx, field)
 			case "dayofweek":
 				return ec.fieldContext_Schedule_dayofweek(ctx, field)
 			case "period":
@@ -1423,8 +1449,12 @@ func (ec *executionContext) fieldContext_Query_schedule(ctx context.Context, fie
 				return ec.fieldContext_Schedule_userid(ctx, field)
 			case "subjectid":
 				return ec.fieldContext_Schedule_subjectid(ctx, field)
-			case "classroom":
-				return ec.fieldContext_Schedule_classroom(ctx, field)
+			case "subjectname":
+				return ec.fieldContext_Schedule_subjectname(ctx, field)
+			case "classroomid":
+				return ec.fieldContext_Schedule_classroomid(ctx, field)
+			case "classroomname":
+				return ec.fieldContext_Schedule_classroomname(ctx, field)
 			case "dayofweek":
 				return ec.fieldContext_Schedule_dayofweek(ctx, field)
 			case "period":
@@ -2060,8 +2090,8 @@ func (ec *executionContext) fieldContext_Schedule_subjectid(_ context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Schedule_classroom(ctx context.Context, field graphql.CollectedField, obj *models.Schedule) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Schedule_classroom(ctx, field)
+func (ec *executionContext) _Schedule_subjectname(ctx context.Context, field graphql.CollectedField, obj *models.Schedule) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Schedule_subjectname(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2074,37 +2104,110 @@ func (ec *executionContext) _Schedule_classroom(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Schedule().Classroom(rctx, obj)
+		return obj.SubjectName, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(*models.Classroom)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNClassroom2ᚖgithubᚗcomᚋmashumarrowᚋtodoapplicationᚋbackendᚋmodelsᚐClassroom(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Schedule_classroom(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Schedule_subjectname(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Schedule",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Schedule_classroomid(ctx context.Context, field graphql.CollectedField, obj *models.Schedule) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Schedule_classroomid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Schedule().Classroomid(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Schedule_classroomid(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Schedule",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "classroomid":
-				return ec.fieldContext_Classroom_classroomid(ctx, field)
-			case "classroomname":
-				return ec.fieldContext_Classroom_classroomname(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Classroom", field.Name)
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Schedule_classroomname(ctx context.Context, field graphql.CollectedField, obj *models.Schedule) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Schedule_classroomname(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClassroomName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Schedule_classroomname(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Schedule",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4398,13 +4501,27 @@ func (ec *executionContext) unmarshalInputNewSchedule(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"dayofweek", "period"}
+	fieldsInOrder := [...]string{"subjectid", "classroomid", "dayofweek", "period", "subjectname", "classroomname"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "subjectid":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subjectid"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Subjectid = data
+		case "classroomid":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("classroomid"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Classroomid = data
 		case "dayofweek":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dayofweek"))
 			data, err := ec.unmarshalNDayofweek2githubᚗcomᚋmashumarrowᚋtodoapplicationᚋbackendᚋgraphᚋmodelᚐDayofweek(ctx, v)
@@ -4419,6 +4536,20 @@ func (ec *executionContext) unmarshalInputNewSchedule(ctx context.Context, obj i
 				return it, err
 			}
 			it.Period = data
+		case "subjectname":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subjectname"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Subjectname = data
+		case "classroomname":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("classroomname"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Classroomname = data
 		}
 	}
 
@@ -5054,19 +5185,18 @@ func (ec *executionContext) _Schedule(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "classroom":
+		case "subjectname":
+			out.Values[i] = ec._Schedule_subjectname(ctx, field, obj)
+		case "classroomid":
 			field := field
 
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Schedule_classroom(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
+				res = ec._Schedule_classroomid(ctx, field, obj)
 				return res
 			}
 
@@ -5090,6 +5220,8 @@ func (ec *executionContext) _Schedule(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "classroomname":
+			out.Values[i] = ec._Schedule_classroomname(ctx, field, obj)
 		case "dayofweek":
 			field := field
 
@@ -6350,6 +6482,16 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 		return graphql.Null
 	}
 	res := graphql.MarshalID(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalString(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalString(v)
 	return res
 }
 

@@ -16,8 +16,12 @@ type NewClassroom struct {
 }
 
 type NewSchedule struct {
-	Dayofweek Dayofweek `json:"dayofweek"`
-	Period    int       `json:"period"`
+	Subjectid     string    `json:"subjectid"`
+	Classroomid   string    `json:"classroomid"`
+	Dayofweek     Dayofweek `json:"dayofweek"`
+	Period        int       `json:"period"`
+	Subjectname   string    `json:"subjectname"`
+	Classroomname string    `json:"classroomname"`
 }
 
 type NewSubject struct {

@@ -6,9 +6,8 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
-	// "github.com/mashumarrow/todoapplication/backend/db"
 	"errors"
+	"fmt"
 
 	"github.com/mashumarrow/todoapplication/backend/graph/model"
 	"github.com/mashumarrow/todoapplication/backend/models"
@@ -52,9 +51,8 @@ func (r *queryResolver) User(ctx context.Context, userid string) (*models.User, 
 func (r *queryResolver) LoginUser(ctx context.Context, name string, password string) (*models.User, error) {
 	var user models.User
 	// データベースに問い合わせて、nameとpasswordが一致するユーザーを検索
-    if err := r.DB.Where("name = ? AND password = ?", name, password).First(&user).Error; err != nil {
-        return nil, errors.New("ユーザーが見つかりません")
-    }
-    return &user, nil
-
+	if err := r.DB.Where("name = ? AND password = ?", name, password).First(&user).Error; err != nil {
+		return nil, errors.New("ユーザーが見つかりません")
+	}
+	return &user, nil
 }

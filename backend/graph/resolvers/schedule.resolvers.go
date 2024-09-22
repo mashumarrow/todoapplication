@@ -6,7 +6,9 @@ package resolvers
 
 import (
 	"context"
+	//"errors"
 	"fmt"
+	//"strconv"
 
 	"github.com/mashumarrow/todoapplication/backend/graph"
 	"github.com/mashumarrow/todoapplication/backend/graph/model"
@@ -15,9 +17,38 @@ import (
 
 // Createschedule is the resolver for the createschedule field.
 func (r *mutationResolver) Createschedule(ctx context.Context, input model.NewSchedule) (*models.Schedule, error) {
+	// userID, err := strconv.ParseUint(input.Userid, 10, 64)
+	// if err != nil {
+	// 	return nil, errors.New("invalid User ID")
+	// }
+
+	userID, ok := ctx.Value("userID").(uint64)
+	if !ok {
+		return nil, fmt.Errorf("user not authenticated")
+	}
+
+	 // subjectnameを基にsubjectIDを取得
+	 var subject models.Subject
+	 if err := r.DB.Where("subject_name = ?", input.Subjectname).First(&subject).Error; err != nil {
+		 return nil, fmt.Errorf("subject not found: %w", err)
+	 }
+	 subjectID := subject.SubjectID
+ 
+	 // classroomnameを基にclassroomIDを取得
+	 var classroom models.Classroom
+	 if err := r.DB.Where("classroom_name = ?", input.Classroomname).First(&classroom).Error; err != nil {
+		 return nil, fmt.Errorf("classroom not found: %w", err)
+	 }
+	 classroomID := classroom.ClassroomID
+ 
 	schedule := &models.Schedule{
-		DayOfWeek: string(input.Dayofweek),
-		Period:    input.Period,
+		UserID:        uint(userID),
+		SubjectID:     uint(subjectID),
+		ClassroomID:   uint(classroomID),
+		DayOfWeek:     string(input.Dayofweek),
+		Period:        input.Period,
+		SubjectName:   input.Subjectname,
+		ClassroomName: input.Classroomname,
 	}
 
 	if err := r.DB.Create(schedule).Error; err != nil {
@@ -54,12 +85,14 @@ func (r *scheduleResolver) Userid(ctx context.Context, obj *models.Schedule) (st
 
 // Subjectid is the resolver for the subjectid field.
 func (r *scheduleResolver) Subjectid(ctx context.Context, obj *models.Schedule) (*string, error) {
-	panic(fmt.Errorf("not implemented: Subjectid - subjectid"))
+	subjectID := fmt.Sprintf("%d", obj.SubjectID)
+	return &subjectID, nil
 }
 
-// Classroom is the resolver for the classroom field.
-func (r *scheduleResolver) Classroom(ctx context.Context, obj *models.Schedule) (*models.Classroom, error) {
-	panic(fmt.Errorf("not implemented: Classroom - classroom"))
+// Classroomid is the resolver for the classroomid field.
+func (r *scheduleResolver) Classroomid(ctx context.Context, obj *models.Schedule) (*string, error) {
+	classroomID := fmt.Sprintf("%d", obj.ClassroomID)
+	return &classroomID, nil
 }
 
 // Dayofweek is the resolver for the dayofweek field.
@@ -78,9 +111,32 @@ type scheduleResolver struct{ *Resolver }
 //   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *scheduleResolver) Classname(ctx context.Context, obj *models.Schedule) (*string, error) {
+	var classroom models.Classroom
+	if err := r.DB.First(&classroom, obj.ClassroomID).Error; err != nil {
+		return nil, err
+	}
+	return &classroom.ClassroomName, nil
+}
+func (r *scheduleResolver) Classroom(ctx context.Context, obj *models.Schedule) (*models.Classroom, error) {
+	var classroom models.Classroom
+	if err := r.DB.First(&classroom, obj.ClassroomID).Error; err != nil {
+		return nil, err
+	}
+
+	return &classroom, nil
+}
 func (r *scheduleResolver) Subject(ctx context.Context, obj *models.Schedule) (*models.Subject, error) {
-	panic(fmt.Errorf("not implemented: Subject - subject"))
+	var subject models.Subject
+	if err := r.DB.First(&subject, obj.SubjectID).Error; err != nil {
+		return nil, err
+	}
+	return &subject, nil
 }
 func (r *scheduleResolver) Todo(ctx context.Context, obj *models.Schedule) (*models.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todo - todo"))
+	var todo models.Todo
+	if err := r.DB.First(&todo, obj.UserID).Error; err != nil {
+		return nil, err
+	}
+	return &todo, nil
 }

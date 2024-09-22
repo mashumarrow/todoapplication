@@ -14,7 +14,13 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"gorm.io/gorm"
+
+    "github.com/gorilla/sessions"
+    "context"
+    "github.com/dgrijalva/jwt-go"
 )
+
+
 
 // NewGraphQLHandler はGraphQLサーバーのハンドラーを作成
 func NewGraphQLHandler(db *gorm.DB) http.Handler {
@@ -125,3 +131,34 @@ func CreateSubjectHandler(db *gorm.DB) http.HandlerFunc {
     }
 }
 
+var store = sessions.NewCookieStore([]byte("your-secret-key"))
+
+// JWT認証用のミドルウェア
+func Middleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        // JWT トークンを Authorization ヘッダーから取得
+        tokenString := r.Header.Get("Authorization")
+        if tokenString == "" {
+            http.Error(w, "Unauthorized", http.StatusUnauthorized)
+            return
+        }
+
+        // トークンをパースしてユーザーIDを取得
+        token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+            return []byte("your_secret_key"), nil
+        })
+        if err != nil || !token.Valid {
+            http.Error(w, "Unauthorized", http.StatusUnauthorized)
+            return
+        }
+
+        if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+            userID := uint(claims["user_id"].(float64)) // JWTからUserIDを取得
+            ctx := context.WithValue(r.Context(), "userID", userID) // context にユーザーIDを追加
+            next.ServeHTTP(w, r.WithContext(ctx))
+        } else {
+            http.Error(w, "Unauthorized", http.StatusUnauthorized)
+            return
+        }
+    })
+}
