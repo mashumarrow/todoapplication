@@ -26,22 +26,37 @@ export default function Home() {
 
   const router = useRouter();
 
-  // ユーザー登録
+  // ユーザー登録＆自動ログイン
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       console.log("送信データ（登録）:", { name, password });
 
-      await registerUser({ variables: { input: { name, password } } });
+      // ユーザーを登録
+      const { data: registerData } = await registerUser({
+        variables: { input: { name, password } },
+      });
       alert("登録が成功しました！");
+
+      // 登録後、ログイン処理を実行
+      const { data: loginResponse } = await loginUser(); // refetchでクエリを実行
+
+      // ログインが成功したらトークンをlocalStorageに保存
+      if (loginResponse?.loginUser?.token) {
+        localStorage.setItem("authToken", loginResponse.loginUser.token);
+        alert("ログイン成功！");
+        router.push("/subject"); // ログイン成功後にページ遷移
+      } else {
+        alert("登録後の自動ログインに失敗しました。");
+      }
 
       // 必要に応じてフォームをリセット
       setName("");
       setPassword("");
     } catch (err) {
       if (err instanceof Error) {
-        console.error("登録エラー:", err.message);
-        alert(`登録に失敗しました: ${err.message}`);
+        console.error("登録またはログインエラー:", err.message);
+        alert(`エラー: ${err.message}`);
       } else {
         console.error("予期しないエラー:", err);
         alert("予期しないエラーが発生しました。");
@@ -55,10 +70,12 @@ export default function Home() {
     try {
       console.log("送信データ（ログイン）:", { name, password });
 
-      const response = await loginUser(); // refetchを使用してクエリを実行
-      console.log("Login response:", response.data);
+      const { data: loginResponse } = await loginUser({
+        variables: { name, password },
+      });
 
-      if (response.data?.loginUser) {
+      if (loginResponse?.loginUser?.token) {
+        localStorage.setItem("authToken", loginResponse.loginUser.token); // トークンをlocalStorageに保存
         alert("ログイン成功！");
         router.push("/subject"); // ログイン成功後にページ遷移
       } else {
