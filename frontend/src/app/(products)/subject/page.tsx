@@ -13,7 +13,14 @@ type Schedule = {
   [key: string]: ScheduleEntry;
 };
 
-const days = ["月", "火", "水", "木", "金", "土"];
+const days = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 const periods = [1, 2, 3, 4, 5, 6];
 
 export default function TimeTable() {
