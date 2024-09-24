@@ -11,7 +11,7 @@ export const REGISTER_USER = gql`
 `;
 
 export const LOGIN_USER = gql`
-  query LoginUser($name: String!, $password: String!) {
+  mutation LoginUser($name: String!, $password: String!) {
     loginUser(name: $name, password: $password) {
       userid
       name

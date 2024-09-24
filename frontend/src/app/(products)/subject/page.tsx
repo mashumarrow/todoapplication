@@ -98,7 +98,7 @@ export default function TimeTable() {
 
     try {
       // ミューテーションの実行
-      await createSchedule({
+      const { data } = await createSchedule({
         variables: {
           input: {
             dayofweek: selectedCell.dayofweek,
@@ -109,25 +109,38 @@ export default function TimeTable() {
         },
       });
 
-      // 手動で状態を更新してセルに反映
-      setSchedule((prevSchedule) => ({
-        ...prevSchedule,
-        [key]: { subject, classroom },
-      }));
+      // ミューテーションが成功した場合
+      if (data) {
+        // 手動で状態を更新してセルに反映
+        setSchedule((prevSchedule) => ({
+          ...prevSchedule,
+          [key]: { subject, classroom },
+        }));
 
-      closeModal();
+        closeModal();
+      }
     } catch (error) {
-      // errorがApolloErrorかどうかを確認
+      // ApolloErrorかどうかを確認
       if (error instanceof ApolloError) {
         if (error.graphQLErrors) {
-          console.error("GraphQL Errors:", error.graphQLErrors);
+          // GraphQLのエラーを詳しく出力
+          error.graphQLErrors.forEach((err) => {
+            console.error("GraphQL Error Message:", err.message);
+            console.error("Error Path:", err.path);
+            console.error("Error Extensions:", err.extensions);
+          });
+          alert(
+            "GraphQL エラーが発生しました。詳細はコンソールを確認してください。"
+          );
         }
         if (error.networkError) {
           console.error("Network Error:", error.networkError);
+          alert("ネットワーク エラーが発生しました。");
         }
       } else {
         // ApolloError以外のエラーの場合
         console.error("An unknown error occurred:", error);
+        alert("予期しないエラーが発生しました。");
       }
     }
   };
