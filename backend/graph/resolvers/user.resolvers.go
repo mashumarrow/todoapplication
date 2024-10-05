@@ -8,25 +8,69 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+
+	 "golang.org/x/crypto/bcrypt"
 
 	"github.com/mashumarrow/todoapplication/backend/graph/model"
 	"github.com/mashumarrow/todoapplication/backend/models"
 )
+// パスワードをハッシュ化する関数
+func hashPassword(password string) (string, error) {
+    bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+    return string(bytes), err
+}
+// ハッシュ化されたパスワードと入力されたパスワードを比較する関数
+func checkPasswordHash(password, hash string) bool {
+    err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+    return err == nil
+}
 
 // RegisterUser is the resolver for the registerUser field.
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.NewUser) (*models.User, error) {
-	user := &models.User{
-		Name:     input.Name,
-		Password: input.Password,
-	}
-
-	if err := r.DB.Create(user).Error; err != nil {
-		return nil, err
-	}
-
-	return user, nil
+	 // パスワードをハッシュ化
+	 hashedPassword, err := hashPassword(input.Password)
+	 if err != nil {
+		 return nil, fmt.Errorf("パスワードのハッシュ化に失敗しました: %w", err)
+	 }
+ 
+	 // ユーザーのデータを保存
+	 user := &models.User{
+		 Name:     input.Name,
+		 Password: hashedPassword, // ハッシュ化されたパスワードを保存
+	 }
+ 
+	 log.Println("ハッシュ化されたパスワード:", hashedPassword)
+ 
+	 if err := r.DB.Create(user).Error; err != nil {
+		 return nil, fmt.Errorf("ユーザーの保存に失敗しました: %w", err)
+	 }
+ 
+	 return user, nil
 }
 
+// LoginUser is the resolver for the loginUser field.
+func (r *mutationResolver) LoginUser(ctx context.Context, name string, password string) (*models.User, error) {
+	var user models.User
+	// 名前でユーザーを検索
+    if err := r.DB.Where("name = ?", name).First(&user).Error; err != nil {
+        log.Println("ユーザーが見つかりません:", name)
+        return nil, errors.New("ユーザーが見つかりません")
+    }
+
+    log.Println("取得したユーザー:", user)
+
+    // パスワードのハッシュをチェック
+    if !checkPasswordHash(password, user.Password) {
+        log.Println("パスワードが間違っています。入力されたパスワード:", password)
+        log.Println("データベースに保存されているハッシュ:", user.Password)
+        return nil, errors.New("パスワードが間違っています")
+    }
+
+    // 認証が成功した場合はユーザー情報を返す
+    log.Println("ログイン成功:", user)
+    return &user, nil
+}
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*models.User, error) {
 	var users []*models.User
@@ -47,12 +91,9 @@ func (r *queryResolver) User(ctx context.Context, userid string) (*models.User, 
 	return &user, nil
 }
 
-// LoginUser is the resolver for the loginUser field.
-func (r *queryResolver) LoginUser(ctx context.Context, name string, password string) (*models.User, error) {
-	var user models.User
-	// データベースに問い合わせて、nameとpasswordが一致するユーザーを検索
-	if err := r.DB.Where("name = ? AND password = ?", name, password).First(&user).Error; err != nil {
-		return nil, errors.New("ユーザーが見つかりません")
-	}
-	return &user, nil
-}
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.

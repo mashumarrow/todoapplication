@@ -40,6 +40,7 @@ export default function Home() {
       setName("");
       setPassword("");
     } catch (err) {
+      // エラーハンドリングの追加
       if (err instanceof Error) {
         console.error("登録エラー:", err.message);
         alert(`登録に失敗しました: ${err.message}`);
@@ -49,8 +50,6 @@ export default function Home() {
       }
     }
   };
-
-  // ユーザーログイン
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -62,12 +61,15 @@ export default function Home() {
       });
 
       if (loginResponse?.loginUser) {
+        // // トークンをlocalStorageに保存
+        localStorage.setItem("authToken", loginResponse.loginUser.token);
         alert("ログイン成功！");
         router.push("/subject"); // ログイン成功後にページ遷移
       } else {
         alert("ユーザー名またはパスワードが間違っています。");
       }
     } catch (err) {
+      // エラーハンドリングの追加
       if (err instanceof Error) {
         console.error("ログインエラー:", err.message);
         alert(`ログインに失敗しました: ${err.message}`);
