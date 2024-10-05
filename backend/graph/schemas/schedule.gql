@@ -1,5 +1,5 @@
 type Schedule {
-  userid: ID!
+  userid: ID
   subjectid: ID
   subjectname: String
   classroomid: ID
