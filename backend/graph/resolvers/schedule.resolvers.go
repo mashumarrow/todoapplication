@@ -6,9 +6,7 @@ package resolvers
 
 import (
 	"context"
-	//"errors"
 	"fmt"
-	//"strconv"
 
 	"github.com/mashumarrow/todoapplication/backend/graph"
 	"github.com/mashumarrow/todoapplication/backend/graph/model"
@@ -27,20 +25,20 @@ func (r *mutationResolver) Createschedule(ctx context.Context, input model.NewSc
 		return nil, fmt.Errorf("user not authenticated")
 	}
 
-	 // subjectnameを基にsubjectIDを取得
-	 var subject models.Subject
-	 if err := r.DB.Where("subject_name = ?", input.Subjectname).First(&subject).Error; err != nil {
-		 return nil, fmt.Errorf("subject not found: %w", err)
-	 }
-	 subjectID := subject.SubjectID
- 
-	 // classroomnameを基にclassroomIDを取得
-	 var classroom models.Classroom
-	 if err := r.DB.Where("classroom_name = ?", input.Classroomname).First(&classroom).Error; err != nil {
-		 return nil, fmt.Errorf("classroom not found: %w", err)
-	 }
-	 classroomID := classroom.ClassroomID
- 
+	// subjectnameを基にsubjectIDを取得
+	var subject models.Subject
+	if err := r.DB.Where("subject_name = ?", input.Subjectname).First(&subject).Error; err != nil {
+		return nil, fmt.Errorf("subject not found: %w", err)
+	}
+	subjectID := subject.SubjectID
+
+	// classroomnameを基にclassroomIDを取得
+	var classroom models.Classroom
+	if err := r.DB.Where("classroom_name = ?", input.Classroomname).First(&classroom).Error; err != nil {
+		return nil, fmt.Errorf("classroom not found: %w", err)
+	}
+	classroomID := classroom.ClassroomID
+
 	schedule := &models.Schedule{
 		UserID:        uint(userID),
 		SubjectID:     uint(subjectID),
@@ -79,8 +77,9 @@ func (r *queryResolver) Schedule(ctx context.Context, userid string) (*models.Sc
 }
 
 // Userid is the resolver for the userid field.
-func (r *scheduleResolver) Userid(ctx context.Context, obj *models.Schedule) (string, error) {
-	return fmt.Sprintf("%d", obj.UserID), nil
+func (r *scheduleResolver) Userid(ctx context.Context, obj *models.Schedule) (*string, error) {
+	userID := fmt.Sprintf("%d", obj.UserID)
+	return &userID, nil
 }
 
 // Subjectid is the resolver for the subjectid field.
