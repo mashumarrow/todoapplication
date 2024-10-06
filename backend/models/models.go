@@ -4,6 +4,7 @@ type User struct {
 	UserID string `gorm:"column:UserID;primaryKey;autoIncrement"`
 	Name   string `gorm:"column:Name"`
 	Password   string `gorm:"column:Password"`
+	Token    string `gorm:"-"`
 }
 
 type NewTodo struct {
@@ -23,7 +24,7 @@ type Classroom struct {
 }
 
 type Schedule struct {
-	UserID      uint   `gorm:"column:UserID;primaryKey"`
+	UserID      uint   `gorm:"column:UserID"`
 	DayOfWeek   string `gorm:"column:DayOfWeek"`
 	Period      int    `gorm:"column:Period"`
 	SubjectID   uint   `gorm:"column:SubjectID"`

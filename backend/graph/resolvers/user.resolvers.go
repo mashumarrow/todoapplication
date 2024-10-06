@@ -9,68 +9,70 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
-	 "golang.org/x/crypto/bcrypt"
-
+	jwt "github.com/golang-jwt/jwt/v4"
 	"github.com/mashumarrow/todoapplication/backend/graph/model"
 	"github.com/mashumarrow/todoapplication/backend/models"
+	"golang.org/x/crypto/bcrypt"
 )
-// パスワードをハッシュ化する関数
-func hashPassword(password string) (string, error) {
-    bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-    return string(bytes), err
-}
-// ハッシュ化されたパスワードと入力されたパスワードを比較する関数
-func checkPasswordHash(password, hash string) bool {
-    err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-    return err == nil
-}
 
 // RegisterUser is the resolver for the registerUser field.
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.NewUser) (*models.User, error) {
-	 // パスワードをハッシュ化
-	 hashedPassword, err := hashPassword(input.Password)
-	 if err != nil {
-		 return nil, fmt.Errorf("パスワードのハッシュ化に失敗しました: %w", err)
-	 }
- 
-	 // ユーザーのデータを保存
-	 user := &models.User{
-		 Name:     input.Name,
-		 Password: hashedPassword, // ハッシュ化されたパスワードを保存
-	 }
- 
-	 log.Println("ハッシュ化されたパスワード:", hashedPassword)
- 
-	 if err := r.DB.Create(user).Error; err != nil {
-		 return nil, fmt.Errorf("ユーザーの保存に失敗しました: %w", err)
-	 }
- 
-	 return user, nil
+	// パスワードをハッシュ化
+	hashedPassword, err := hashPassword(input.Password)
+	if err != nil {
+		return nil, fmt.Errorf("パスワードのハッシュ化に失敗しました: %w", err)
+	}
+
+	// ユーザーのデータを保存
+	user := &models.User{
+		Name:     input.Name,
+		Password: hashedPassword, // ハッシュ化されたパスワードを保存
+	}
+
+	log.Println("ハッシュ化されたパスワード:", hashedPassword)
+
+	if err := r.DB.Create(user).Error; err != nil {
+		return nil, fmt.Errorf("ユーザーの保存に失敗しました: %w", err)
+	}
+
+	return user, nil
 }
 
 // LoginUser is the resolver for the loginUser field.
 func (r *mutationResolver) LoginUser(ctx context.Context, name string, password string) (*models.User, error) {
 	var user models.User
 	// 名前でユーザーを検索
-    if err := r.DB.Where("name = ?", name).First(&user).Error; err != nil {
-        log.Println("ユーザーが見つかりません:", name)
-        return nil, errors.New("ユーザーが見つかりません")
-    }
+	if err := r.DB.Where("name = ?", name).First(&user).Error; err != nil {
+		log.Println("ユーザーが見つかりません:", name)
+		return nil, errors.New("ユーザーが見つかりません")
+	}
 
-    log.Println("取得したユーザー:", user)
+	log.Println("取得したユーザー:", user)
 
-    // パスワードのハッシュをチェック
-    if !checkPasswordHash(password, user.Password) {
-        log.Println("パスワードが間違っています。入力されたパスワード:", password)
-        log.Println("データベースに保存されているハッシュ:", user.Password)
-        return nil, errors.New("パスワードが間違っています")
-    }
+	// パスワードのハッシュをチェック
+	if !checkPasswordHash(password, user.Password) {
+		log.Println("パスワードが間違っています。入力されたパスワード:", password)
+		log.Println("データベースに保存されているハッシュ:", user.Password)
+		return nil, errors.New("パスワードが間違っています")
+	} else {
+		log.Println("パスワードが正しく照合されました。")
+	}
+	// トークンの生成
+	token, err := generateToken(&user)
+	if err != nil {
+		log.Println("トークンの生成に失敗しました:", err)
+		return nil, errors.New("トークンの生成に失敗しました")
+	} else {
+		log.Println("生成されたトークン:", token)
+	}
 
-    // 認証が成功した場合はユーザー情報を返す
-    log.Println("ログイン成功:", user)
-    return &user, nil
+	// 認証が成功した場合はユーザー情報とトークンを返す
+	user.Token = token // モデルに `Token` フィールドを追加
+	return &user, nil
 }
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*models.User, error) {
 	var users []*models.User
@@ -97,3 +99,24 @@ func (r *queryResolver) User(ctx context.Context, userid string) (*models.User, 
 //   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(bytes), err
+}
+func checkPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+func generateToken(user *models.User) (string, error) {
+	// トークンに含めるクレーム（情報）
+	claims := jwt.MapClaims{
+		"userid": user.UserID,
+		"name":   user.Name,
+		"exp":    time.Now().Add(time.Hour * 72).Unix(), // トークンの有効期限（72時間）
+	}
+
+	// トークンの署名
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	secretKey := []byte("your_secret_key") // 秘密鍵を設定
+	return token.SignedString(secretKey)
+}
