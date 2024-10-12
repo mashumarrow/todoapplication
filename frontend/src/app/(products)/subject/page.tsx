@@ -1,8 +1,8 @@
 "use client"; // 必須
 
 import React, { useState, useEffect } from "react";
-import { useMutation, useQuery, ApolloError } from "@apollo/client";
-import { CREATE_SCHEDULE, GET_SCHEDULES } from "../../../graphql/queries";
+import { useMutation, ApolloError } from "@apollo/client";
+import { CREATE_SCHEDULE } from "../../../graphql/queries";
 
 type ScheduleEntry = {
   subject: string;
@@ -32,48 +32,27 @@ export default function TimeTable() {
   }>({ dayofweek: "", period: 0 });
   const [subject, setSubject] = useState("");
   const [classroom, setClassroom] = useState("");
+  const [savedToken, setSavedToken] = useState<string | null>(null); // stateに保存
 
-  // Apollo Client: データ取得
-  const { data: scheduleData, refetch } = useQuery(GET_SCHEDULES);
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    setSavedToken(token); // stateにトークンを保存
+    console.log("取得したトークン:", token);
+    if (token) {
+      console.log("トークンが見つかりました:", token);
+    } else {
+      console.log("トークンが存在しません。ログインが必要です。");
+    }
+  }, []);
 
   // Apollo Client: ミューテーション
   const [createSchedule] = useMutation(CREATE_SCHEDULE, {
-    update(cache, { data: { createschedule } }) {
-      // キャッシュを手動で更新
-      const existingSchedules: any = cache.readQuery({ query: GET_SCHEDULES });
-      const newScheduleEntry = createschedule;
-
-      cache.writeQuery({
-        query: GET_SCHEDULES,
-        data: {
-          schedules: [...existingSchedules.schedules, newScheduleEntry],
-        },
-      });
+    context: {
+      headers: {
+        Authorization: savedToken ? `Bearer ${savedToken}` : undefined, // stateから取得
+      },
     },
   });
-
-  useEffect(() => {
-    if (scheduleData && scheduleData.schedules) {
-      const newSchedule: Schedule = {};
-
-      scheduleData.schedules.forEach(
-        (item: {
-          dayofweek: string;
-          period: number;
-          subjectname: string;
-          classroomname: string;
-        }) => {
-          const key = `${item.dayofweek}${item.period}`;
-          newSchedule[key] = {
-            subject: item.subjectname,
-            classroom: item.classroomname,
-          };
-        }
-      );
-
-      setSchedule(newSchedule);
-    }
-  }, [scheduleData]);
 
   // モーダルを開く関数
   const openModal = (dayofweek: string, period: number) => {
@@ -97,7 +76,6 @@ export default function TimeTable() {
     const key = `${selectedCell.dayofweek}${selectedCell.period}`;
 
     try {
-      // ミューテーションの実行
       const { data } = await createSchedule({
         variables: {
           input: {
@@ -109,37 +87,28 @@ export default function TimeTable() {
         },
       });
 
-      // ミューテーションが成功した場合
       if (data) {
-        // 手動で状態を更新してセルに反映
         setSchedule((prevSchedule) => ({
           ...prevSchedule,
-          [key]: { subject, classroom },
+          [key]: {
+            subject,
+            classroom,
+          },
         }));
-
         closeModal();
       }
     } catch (error) {
-      // ApolloErrorかどうかを確認
+      console.log(error);
       if (error instanceof ApolloError) {
-        if (error.graphQLErrors) {
-          // GraphQLのエラーを詳しく出力
-          error.graphQLErrors.forEach((err) => {
-            console.error("GraphQL Error Message:", err.message);
-            console.error("Error Path:", err.path);
-            console.error("Error Extensions:", err.extensions);
-          });
-          alert(
-            "GraphQL エラーが発生しました。詳細はコンソールを確認してください。"
-          );
-        }
-        if (error.networkError) {
-          console.error("Network Error:", error.networkError);
-          alert("ネットワーク エラーが発生しました。");
-        }
+        console.error(
+          "GraphQLエラー:",
+          error.graphQLErrors?.map((err) => err.message) || "なし",
+          "ネットワークエラー:",
+          error.networkError || "なし"
+        );
+        alert("エラーが発生しました。詳細はコンソールを確認してください。");
       } else {
-        // ApolloError以外のエラーの場合
-        console.error("An unknown error occurred:", error);
+        console.error("予期しないエラー:", error);
         alert("予期しないエラーが発生しました。");
       }
     }
