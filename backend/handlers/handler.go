@@ -131,7 +131,7 @@ func CreateSubjectHandler(db *gorm.DB) http.HandlerFunc {
     }
 }
 
-var store = sessions.NewCookieStore([]byte("your-secret-key"))
+var store = sessions.NewCookieStore([]byte("your_secret_key"))
 
 // JWT認証用のミドルウェア
 func Middleware(next http.Handler) http.Handler {
