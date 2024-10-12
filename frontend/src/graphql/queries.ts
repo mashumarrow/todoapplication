@@ -23,10 +23,7 @@ export const LOGIN_USER = gql`
 export const CREATE_SCHEDULE = gql`
   mutation createschedule($input: NewSchedule!) {
     createschedule(input: $input) {
-      userid
-      subjectid
       subjectname
-      classroomid
       classroomname
       dayofweek
       period
@@ -38,10 +35,8 @@ export const GET_SCHEDULES = gql`
   query GetSchedules {
     schedules {
       userid
-      subjectid
       subjectname
       classroomname
-      classroomid
       dayofweek
       period
     }

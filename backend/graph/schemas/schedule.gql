@@ -1,8 +1,6 @@
 type Schedule {
   userid: ID
-  subjectid: ID
   subjectname: String
-  classroomid: ID
   classroomname: String
   dayofweek: Dayofweek!
   period: Int!
