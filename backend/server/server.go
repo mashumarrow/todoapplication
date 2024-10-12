@@ -5,19 +5,21 @@ import (
     "net/http"
     
     "github.com/rs/cors"
-    //"github.com/gorilla/mux"
+    "github.com/gorilla/mux"
     "github.com/mashumarrow/todoapplication/backend/handlers"
     "gorm.io/gorm"
 )
 
 type Server struct {
     DB   *gorm.DB
+    Router *mux.Router
     Port string
 }
 
 func NewServer(db *gorm.DB, port string) *Server {
     return &Server{
         DB:   db,
+        Router: mux.NewRouter(),
         Port: port,
     }
 }
