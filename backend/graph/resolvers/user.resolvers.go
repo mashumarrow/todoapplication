@@ -72,6 +72,10 @@ func (r *mutationResolver) LoginUser(ctx context.Context, name string, password 
 
 	// 認証が成功した場合はユーザー情報とトークンを返す
 	user.Token = token // モデルに `Token` フィールドを追加
+	// ユーザーIDをコンテキストに保存
+	ctx = context.WithValue(ctx, "userID", user.UserID)
+	fmt.Println("context.withvalue")
+	fmt.Println(user.UserID)
 	return &user, nil
 }
 
