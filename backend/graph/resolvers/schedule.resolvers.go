@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/mashumarrow/todoapplication/backend/graph"
 	"github.com/mashumarrow/todoapplication/backend/graph/model"
@@ -17,18 +18,26 @@ import (
 // Createschedule is the resolver for the createschedule field.
 func (r *mutationResolver) Createschedule(ctx context.Context, input model.NewSchedule) (*models.Schedule, error) {
 
+	fmt.Println(&ctx)
+	fmt.Println(ctx)
 	fmt.Println("createschedule")
 	 // 認証されているユーザーのuserIDを取得
 	 userIDValue := ctx.Value("userID")
 	 var userID uint64
 	 
-	 if id, ok := userIDValue.(uint64); ok {
-		 userID = id // ここで直接uint64にアサートする
-		 fmt.Println("User ID in handler:", userID) // デバッグログ
-	 } else {
-		 fmt.Println("Failed to get user ID from context:", userIDValue) // ここで何が返ってきたか確認
-		 return nil, fmt.Errorf("user not authenticated")
-	 }
+	 if id, ok := userIDValue.(string); ok {
+		// stringからuint64に変換
+		parsedID, err := strconv.ParseUint(id, 10, 64)
+		if err != nil {
+			fmt.Println("Failed to parse user ID:", id) // 変換失敗時のログ
+			return nil, fmt.Errorf("invalid user ID format")
+		}
+		userID = parsedID
+		fmt.Println("User ID in handler:", userID) // デバッグログ
+	} else {
+		fmt.Println("Failed to get user ID from context:", userIDValue) // ここで何が返ってきたか確認
+		return nil, fmt.Errorf("user not authenticated")
+	}
 	 fmt.Println("createschedule:認証されているユーザーのuserIDを取得")
  
 	 // スケジュールの作成
