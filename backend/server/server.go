@@ -6,7 +6,7 @@ import (
     
     "github.com/rs/cors"
     "github.com/gorilla/mux"
-    "github.com/mashumarrow/todoapplication/backend/handlers"
+   // "github.com/mashumarrow/todoapplication/backend/handlers"
     "gorm.io/gorm"
 )
 
@@ -17,6 +17,8 @@ type Server struct {
 }
 
 func NewServer(db *gorm.DB, port string) *Server {
+    
+    
     return &Server{
         DB:   db,
         Router: mux.NewRouter(),
@@ -25,7 +27,7 @@ func NewServer(db *gorm.DB, port string) *Server {
 }
 
 func (s *Server) Start() {
-    mux := http.NewServeMux()
+   // mux := http.NewServeMux()
 
      // CORS設定
      c := cors.New(cors.Options{
@@ -34,7 +36,7 @@ func (s *Server) Start() {
         AllowedHeaders:   []string{"Authorization", "Content-Type"},
     })
    
-    mux.Handle("/graphql", handler.NewGraphQLHandler(s.DB))
+    //mux.Handle("/graphql", handler.NewGraphQLHandler(s.DB))
    
 
     //mux.Handle("/playground", handler.NewPlaygroundHandler())
@@ -46,5 +48,5 @@ func (s *Server) Start() {
     // mux.HandleFunc("/subjects/get", handler.GetSubjectsHandler(s.DB))
 
     log.Printf("サーバーが起動しました: http://localhost:%s/graphql", s.Port)
-    log.Fatal(http.ListenAndServe(":"+s.Port, c.Handler(mux))) 
+    log.Fatal(http.ListenAndServe(":"+s.Port, c.Handler(s.Router)))
 }
