@@ -5,7 +5,7 @@ import (
     "strings"
     "context"
     jwt "github.com/golang-jwt/jwt/v4"
-    //"github.com/mashumarrow/todoapplication/backend/handlers" 
+    "github.com/mashumarrow/todoapplication/backend/handlers" 
     "github.com/mashumarrow/todoapplication/backend/db/migrations"
     "github.com/mashumarrow/todoapplication/backend/server"
     "fmt"
@@ -25,8 +25,10 @@ func main() {
     // サーバーを作成
     srv := server.NewServer(database.DB, "8080")
 
-     // ミドルウェアをルーターに適用
+     // ミドルウェア付きのルーターを作成
      srv.Router.Use(middleware)
+
+    srv.Router.Handle("/graphql", handler.NewGraphQLHandler(srv.DB)) 
 
     // サーバーを開始
     srv.Start()
@@ -37,15 +39,17 @@ func main() {
 // ミドルウェア関数
 func middleware(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        fmt.Println("middleware")
         tokenString := r.Header.Get("Authorization")
         if tokenString != "" {
             tokenString = strings.TrimPrefix(tokenString, "Bearer ")
             token, err := verifyToken(tokenString)
             if err == nil {
                 if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-                    userID := claims["userid"].(uint64)
-                    ctx := context.WithValue(r.Context(), "userID", userID)
-                    r = r.WithContext(ctx)
+                    UserID := claims["userid"].(string)
+                    ctx := context.WithValue(r.Context(), "userID", UserID)
+                    next.ServeHTTP(w, r.WithContext(ctx))  // ここで r にコンテキストをセットして渡す
+                    return 
                 }
             }
         }
