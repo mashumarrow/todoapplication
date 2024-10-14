@@ -9,14 +9,13 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"time"
 	"os"
+	"time"
 
 	jwt "github.com/golang-jwt/jwt/v4"
 	"github.com/mashumarrow/todoapplication/backend/graph/model"
 	"github.com/mashumarrow/todoapplication/backend/models"
 	"golang.org/x/crypto/bcrypt"
-	
 )
 
 // RegisterUser is the resolver for the registerUser field.
@@ -114,23 +113,23 @@ func checkPasswordHash(password, hash string) bool {
 	return err == nil
 }
 func generateToken(user *models.User) (string, error) {
-  // トークンに含めるクレーム（情報）
-  claims := jwt.MapClaims{
-	"userid": user.UserID,
-	"name":   user.Name,
-	"exp":    time.Now().Add(time.Hour * 72).Unix(), // トークンの有効期限（72時間）
-}
+	// トークンに含めるクレーム（情報）
+	claims := jwt.MapClaims{
+		"userid": user.UserID,
+		"name":   user.Name,
+		"exp":    time.Now().Add(time.Hour * 72).Unix(), // トークンの有効期限（72時間）
+	}
 
-// トークンの署名
-token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	// トークンの署名
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-// 環境変数からシークレットキーを取得
-secretKey := []byte(os.Getenv("JWT_SECRET"))
+	// 環境変数からシークレットキーを取得
+	secretKey := []byte(os.Getenv("JWT_SECRET"))
 
-// シークレットキーが設定されていない場合の対処
-if len(secretKey) == 0 {
-	return "", errors.New("シークレットキーが設定されていません")
-}
+	// シークレットキーが設定されていない場合の対処
+	if len(secretKey) == 0 {
+		return "", errors.New("シークレットキーが設定されていません")
+	}
 
-return token.SignedString(secretKey)
+	return token.SignedString(secretKey)
 }

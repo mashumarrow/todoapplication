@@ -17,15 +17,14 @@ import (
 
 // Createschedule is the resolver for the createschedule field.
 func (r *mutationResolver) Createschedule(ctx context.Context, input model.NewSchedule) (*models.Schedule, error) {
-
 	fmt.Println(&ctx)
 	fmt.Println(ctx)
 	fmt.Println("createschedule")
-	 // 認証されているユーザーのuserIDを取得
-	 userIDValue := ctx.Value("userID")
-	 var userID uint64
-	 
-	 if id, ok := userIDValue.(string); ok {
+	// 認証されているユーザーのuserIDを取得
+	userIDValue := ctx.Value("userID")
+	var userID uint64
+
+	if id, ok := userIDValue.(string); ok {
 		// stringからuint64に変換
 		parsedID, err := strconv.ParseUint(id, 10, 64)
 		if err != nil {
@@ -38,37 +37,37 @@ func (r *mutationResolver) Createschedule(ctx context.Context, input model.NewSc
 		fmt.Println("Failed to get user ID from context:", userIDValue) // ここで何が返ってきたか確認
 		return nil, fmt.Errorf("user not authenticated")
 	}
-	 fmt.Println("createschedule:認証されているユーザーのuserIDを取得")
- 
-	 // スケジュールの作成
-	 schedule := &models.Schedule{
-		 UserID:        uint(userID),
-		 DayOfWeek:     string(input.Dayofweek),
-		 Period:        input.Period,
-		 SubjectName:   input.Subjectname,
-		 ClassroomName: input.Classroomname,
-	 }
- 
-	 // スケジュールをデータベースに保存
-	 if err := r.DB.Create(schedule).Error; err != nil {
-		 return nil, err
-	 }
-	 fmt.Println("createschedule:データベースに保存")
-	 return schedule, nil
+	fmt.Println("createschedule:認証されているユーザーのuserIDを取得")
+
+	// スケジュールの作成
+	schedule := &models.Schedule{
+		UserID:        uint(userID),
+		DayOfWeek:     string(input.Dayofweek),
+		Period:        input.Period,
+		SubjectName:   input.Subjectname,
+		ClassroomName: input.Classroomname,
+	}
+
+	// スケジュールをデータベースに保存
+	if err := r.DB.Create(schedule).Error; err != nil {
+		return nil, err
+	}
+	fmt.Println("createschedule:データベースに保存")
+	return schedule, nil
 }
 
 // Schedules is the resolver for the schedules field.
 func (r *queryResolver) Schedules(ctx context.Context) ([]*models.Schedule, error) {
 	var schedules []*models.Schedule
 
-    // データベースからスケジュールを取得
-    if err := r.DB.Find(&schedules).Error; err != nil {
-        return nil, fmt.Errorf("failed to retrieve schedules: %w", err)
-    }
+	// データベースからスケジュールを取得
+	if err := r.DB.Find(&schedules).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve schedules: %w", err)
+	}
 
-    log.Println("取得したスケジュール:", schedules) // デバッグ用のログ
+	log.Println("取得したスケジュール:", schedules) // デバッグ用のログ
 
-    return schedules, nil
+	return schedules, nil
 }
 
 // Schedule is the resolver for the schedule field.
@@ -102,24 +101,13 @@ type scheduleResolver struct{ *Resolver }
 //   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *scheduleResolver) Subjectid(ctx context.Context, obj *models.Schedule) (*string, error) {
-	subjectID := fmt.Sprintf("%d", obj.SubjectID)
-	return &subjectID, nil
-}
-func (r *scheduleResolver) Classroomid(ctx context.Context, obj *models.Schedule) (*string, error) {
-	classroomID := fmt.Sprintf("%d", obj.ClassroomID)
-	return &classroomID, nil
-}
 func (r *scheduleResolver) Classname(ctx context.Context, obj *models.Schedule) (*string, error) {
-	var classroom models.Classroom
-	if err := r.DB.First(&classroom, obj.ClassroomID).Error; err != nil {
-		return nil, err
-	}
-	return &classroom.ClassroomName, nil
+	return &obj.ClassroomName, nil
 }
 func (r *scheduleResolver) Classroom(ctx context.Context, obj *models.Schedule) (*models.Classroom, error) {
 	var classroom models.Classroom
-	if err := r.DB.First(&classroom, obj.ClassroomID).Error; err != nil {
+	
+	if err := r.DB.Where("classroom_name = ?", obj.ClassroomName).First(&classroom).Error; err != nil {
 		return nil, err
 	}
 
@@ -127,7 +115,8 @@ func (r *scheduleResolver) Classroom(ctx context.Context, obj *models.Schedule) 
 }
 func (r *scheduleResolver) Subject(ctx context.Context, obj *models.Schedule) (*models.Subject, error) {
 	var subject models.Subject
-	if err := r.DB.First(&subject, obj.SubjectID).Error; err != nil {
+	
+	if err := r.DB.Where("subject_name = ?", obj.SubjectName).First(&subject).Error; err != nil {
 		return nil, err
 	}
 	return &subject, nil

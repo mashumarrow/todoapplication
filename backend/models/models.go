@@ -27,9 +27,9 @@ type Schedule struct {
 	UserID      uint   `gorm:"column:UserID"`
 	DayOfWeek   string `gorm:"column:DayOfWeek"`
 	Period      int    `gorm:"column:Period"`
-	SubjectID   uint   `gorm:"column:SubjectID"`
+	
 	SubjectName string `gorm:"column:SubjectName"`
-	ClassroomID uint   `gorm:"column:ClassroomID"`
+	
 	ClassroomName string `gorm:"column:ClassroomName"`
 }
 
