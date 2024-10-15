@@ -1,11 +1,13 @@
 -- +goose Up
 CREATE TABLE IF NOT EXISTS schedules(
-    UserID BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ScheduleID BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    UserID BIGINT UNSIGNED NOT NULL,
     
     Dayofweek ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NOT NULL,
     Period INT NOT NULL,
     ClassroomName VARCHAR(255),
     SubjectName VARCHAR(255),
+    
     
     FOREIGN KEY (UserID) REFERENCES users(UserID)
 );

@@ -24,6 +24,7 @@ type Classroom struct {
 }
 
 type Schedule struct {
+	ScheduleID uint `gorm:"primaryKey;autoIncrement;column:ScheduleID"`
 	UserID      uint   `gorm:"column:UserID"`
 	DayOfWeek   string `gorm:"column:DayOfWeek"`
 	Period      int    `gorm:"column:Period"`

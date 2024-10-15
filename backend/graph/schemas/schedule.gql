@@ -1,4 +1,5 @@
 type Schedule {
+  scheduleid: ID!
   userid: ID
   subjectname: String
   classroomname: String

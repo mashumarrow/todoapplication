@@ -39,6 +39,12 @@ func (r *mutationResolver) Createschedule(ctx context.Context, input model.NewSc
 	}
 	fmt.Println("createschedule:認証されているユーザーのuserIDを取得")
 
+	// 同じスケジュールが存在しないか確認
+	var existingSchedule models.Schedule
+	if err := r.DB.Where("user_id = ? AND dayofweek = ? AND period = ?", userID, input.Dayofweek, input.Period).First(&existingSchedule).Error; err == nil {
+		return nil, fmt.Errorf("schedule already exists for this user at this time")
+	}
+
 	// スケジュールの作成
 	schedule := &models.Schedule{
 		UserID:        uint(userID),
@@ -79,6 +85,15 @@ func (r *queryResolver) Schedule(ctx context.Context, userid string) (*models.Sc
 	return &schedule, nil
 }
 
+// Scheduleid is the resolver for the scheduleid field.
+func (r *scheduleResolver) Scheduleid(ctx context.Context, obj *models.Schedule) (string, error) {
+	if obj.ScheduleID == 0 {
+		return "", fmt.Errorf("schedule ID is not available")
+	}
+
+	return fmt.Sprintf("%d", obj.ScheduleID), nil
+}
+
 // Userid is the resolver for the userid field.
 func (r *scheduleResolver) Userid(ctx context.Context, obj *models.Schedule) (*string, error) {
 	userID := fmt.Sprintf("%d", obj.UserID)
@@ -101,12 +116,13 @@ type scheduleResolver struct{ *Resolver }
 //   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
+
 func (r *scheduleResolver) Classname(ctx context.Context, obj *models.Schedule) (*string, error) {
 	return &obj.ClassroomName, nil
 }
 func (r *scheduleResolver) Classroom(ctx context.Context, obj *models.Schedule) (*models.Classroom, error) {
 	var classroom models.Classroom
-	
+
 	if err := r.DB.Where("classroom_name = ?", obj.ClassroomName).First(&classroom).Error; err != nil {
 		return nil, err
 	}
@@ -115,7 +131,7 @@ func (r *scheduleResolver) Classroom(ctx context.Context, obj *models.Schedule) 
 }
 func (r *scheduleResolver) Subject(ctx context.Context, obj *models.Schedule) (*models.Subject, error) {
 	var subject models.Subject
-	
+
 	if err := r.DB.Where("subject_name = ?", obj.SubjectName).First(&subject).Error; err != nil {
 		return nil, err
 	}
