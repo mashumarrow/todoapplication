@@ -1,14 +1,18 @@
 type Todo {
+  Todoid: ID!
   userid: ID!
   title: String!
+  period: Int!
   completed: Boolean!
-  subjectid: ID
+  subjectname: String
+  classroomname: String
 }
 
 input NewTodo {
   title: String!
-  userid: ID!
-  subjectid: ID
+  period: Int!
+  subjectname: String!
+  classroomname: String!
 }
 extend type Query {
   todos: [Todo!]!
