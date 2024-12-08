@@ -46,7 +46,6 @@ type ResolverRoot interface {
 	Schedule() ScheduleResolver
 	Subject() SubjectResolver
 	Todo() TodoResolver
-	NewTodo() NewTodoResolver
 }
 
 type DirectiveRoot struct {
@@ -95,10 +94,13 @@ type ComplexityRoot struct {
 	}
 
 	Todo struct {
-		Completed func(childComplexity int) int
-		Subjectid func(childComplexity int) int
-		Title     func(childComplexity int) int
-		Userid    func(childComplexity int) int
+		Classroomname func(childComplexity int) int
+		Completed     func(childComplexity int) int
+		Period        func(childComplexity int) int
+		Subjectname   func(childComplexity int) int
+		Title         func(childComplexity int) int
+		Todoid        func(childComplexity int) int
+		Userid        func(childComplexity int) int
 	}
 
 	User struct {
@@ -142,14 +144,11 @@ type SubjectResolver interface {
 	Subjectid(ctx context.Context, obj *models.Subject) (string, error)
 }
 type TodoResolver interface {
+	Todoid(ctx context.Context, obj *models.Todo) (string, error)
 	Userid(ctx context.Context, obj *models.Todo) (string, error)
 
-	Subjectid(ctx context.Context, obj *models.Todo) (*string, error)
-}
-
-type NewTodoResolver interface {
-	Userid(ctx context.Context, obj *models.NewTodo, data string) error
-	Subjectid(ctx context.Context, obj *models.NewTodo, data *string) error
+	Subjectname(ctx context.Context, obj *models.Todo) (*string, error)
+	Classroomname(ctx context.Context, obj *models.Todo) (*string, error)
 }
 
 type executableSchema struct {
@@ -408,6 +407,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Subject.Subjectid(childComplexity), true
 
+	case "Todo.classroomname":
+		if e.complexity.Todo.Classroomname == nil {
+			break
+		}
+
+		return e.complexity.Todo.Classroomname(childComplexity), true
+
 	case "Todo.completed":
 		if e.complexity.Todo.Completed == nil {
 			break
@@ -415,12 +421,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Todo.Completed(childComplexity), true
 
-	case "Todo.subjectid":
-		if e.complexity.Todo.Subjectid == nil {
+	case "Todo.period":
+		if e.complexity.Todo.Period == nil {
 			break
 		}
 
-		return e.complexity.Todo.Subjectid(childComplexity), true
+		return e.complexity.Todo.Period(childComplexity), true
+
+	case "Todo.subjectname":
+		if e.complexity.Todo.Subjectname == nil {
+			break
+		}
+
+		return e.complexity.Todo.Subjectname(childComplexity), true
 
 	case "Todo.title":
 		if e.complexity.Todo.Title == nil {
@@ -428,6 +441,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Todo.Title(childComplexity), true
+
+	case "Todo.Todoid":
+		if e.complexity.Todo.Todoid == nil {
+			break
+		}
+
+		return e.complexity.Todo.Todoid(childComplexity), true
 
 	case "Todo.userid":
 		if e.complexity.Todo.Userid == nil {
@@ -573,7 +593,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "schemas/classroom.gql" "schemas/schedule.gql" "schemas/subject.gql" "schemas/todo.gql" "schemas/user.gql"
+//go:embed "schemas/classroom.gql" "schemas/schedule.gql" "schemas/subject.gql" "schemas/todos.gql" "schemas/user.gql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -588,7 +608,7 @@ var sources = []*ast.Source{
 	{Name: "schemas/classroom.gql", Input: sourceData("schemas/classroom.gql"), BuiltIn: false},
 	{Name: "schemas/schedule.gql", Input: sourceData("schemas/schedule.gql"), BuiltIn: false},
 	{Name: "schemas/subject.gql", Input: sourceData("schemas/subject.gql"), BuiltIn: false},
-	{Name: "schemas/todo.gql", Input: sourceData("schemas/todo.gql"), BuiltIn: false},
+	{Name: "schemas/todos.gql", Input: sourceData("schemas/todos.gql"), BuiltIn: false},
 	{Name: "schemas/user.gql", Input: sourceData("schemas/user.gql"), BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -1142,14 +1162,20 @@ func (ec *executionContext) fieldContext_Mutation_createTodo(ctx context.Context
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "Todoid":
+				return ec.fieldContext_Todo_Todoid(ctx, field)
 			case "userid":
 				return ec.fieldContext_Todo_userid(ctx, field)
 			case "title":
 				return ec.fieldContext_Todo_title(ctx, field)
+			case "period":
+				return ec.fieldContext_Todo_period(ctx, field)
 			case "completed":
 				return ec.fieldContext_Todo_completed(ctx, field)
-			case "subjectid":
-				return ec.fieldContext_Todo_subjectid(ctx, field)
+			case "subjectname":
+				return ec.fieldContext_Todo_subjectname(ctx, field)
+			case "classroomname":
+				return ec.fieldContext_Todo_classroomname(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Todo", field.Name)
 		},
@@ -1683,14 +1709,20 @@ func (ec *executionContext) fieldContext_Query_todos(_ context.Context, field gr
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "Todoid":
+				return ec.fieldContext_Todo_Todoid(ctx, field)
 			case "userid":
 				return ec.fieldContext_Todo_userid(ctx, field)
 			case "title":
 				return ec.fieldContext_Todo_title(ctx, field)
+			case "period":
+				return ec.fieldContext_Todo_period(ctx, field)
 			case "completed":
 				return ec.fieldContext_Todo_completed(ctx, field)
-			case "subjectid":
-				return ec.fieldContext_Todo_subjectid(ctx, field)
+			case "subjectname":
+				return ec.fieldContext_Todo_subjectname(ctx, field)
+			case "classroomname":
+				return ec.fieldContext_Todo_classroomname(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Todo", field.Name)
 		},
@@ -1737,14 +1769,20 @@ func (ec *executionContext) fieldContext_Query_todo(ctx context.Context, field g
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "Todoid":
+				return ec.fieldContext_Todo_Todoid(ctx, field)
 			case "userid":
 				return ec.fieldContext_Todo_userid(ctx, field)
 			case "title":
 				return ec.fieldContext_Todo_title(ctx, field)
+			case "period":
+				return ec.fieldContext_Todo_period(ctx, field)
 			case "completed":
 				return ec.fieldContext_Todo_completed(ctx, field)
-			case "subjectid":
-				return ec.fieldContext_Todo_subjectid(ctx, field)
+			case "subjectname":
+				return ec.fieldContext_Todo_subjectname(ctx, field)
+			case "classroomname":
+				return ec.fieldContext_Todo_classroomname(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Todo", field.Name)
 		},
@@ -2348,6 +2386,50 @@ func (ec *executionContext) fieldContext_Subject_subjectname(_ context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _Todo_Todoid(ctx context.Context, field graphql.CollectedField, obj *models.Todo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Todo_Todoid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Todo().Todoid(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Todo_Todoid(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Todo",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Todo_userid(ctx context.Context, field graphql.CollectedField, obj *models.Todo) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Todo_userid(ctx, field)
 	if err != nil {
@@ -2436,6 +2518,50 @@ func (ec *executionContext) fieldContext_Todo_title(_ context.Context, field gra
 	return fc, nil
 }
 
+func (ec *executionContext) _Todo_period(ctx context.Context, field graphql.CollectedField, obj *models.Todo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Todo_period(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Period, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Todo_period(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Todo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Todo_completed(ctx context.Context, field graphql.CollectedField, obj *models.Todo) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Todo_completed(ctx, field)
 	if err != nil {
@@ -2480,8 +2606,8 @@ func (ec *executionContext) fieldContext_Todo_completed(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Todo_subjectid(ctx context.Context, field graphql.CollectedField, obj *models.Todo) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Todo_subjectid(ctx, field)
+func (ec *executionContext) _Todo_subjectname(ctx context.Context, field graphql.CollectedField, obj *models.Todo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Todo_subjectname(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2494,7 +2620,7 @@ func (ec *executionContext) _Todo_subjectid(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Todo().Subjectid(rctx, obj)
+		return ec.resolvers.Todo().Subjectname(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2505,17 +2631,58 @@ func (ec *executionContext) _Todo_subjectid(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Todo_subjectid(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Todo_subjectname(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Todo",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Todo_classroomname(ctx context.Context, field graphql.CollectedField, obj *models.Todo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Todo_classroomname(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Todo().Classroomname(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Todo_classroomname(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Todo",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4579,7 +4746,7 @@ func (ec *executionContext) unmarshalInputNewTodo(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "userid", "subjectid"}
+	fieldsInOrder := [...]string{"title", "period", "subjectname", "classroomname"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4593,24 +4760,27 @@ func (ec *executionContext) unmarshalInputNewTodo(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Title = data
-		case "userid":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userid"))
-			data, err := ec.unmarshalNID2string(ctx, v)
+		case "period":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("period"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			if err = ec.resolvers.NewTodo().Userid(ctx, &it, data); err != nil {
-				return it, err
-			}
-		case "subjectid":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subjectid"))
-			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			it.Period = data
+		case "subjectname":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subjectname"))
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			if err = ec.resolvers.NewTodo().Subjectid(ctx, &it, data); err != nil {
+			it.Subjectname = data
+		case "classroomname":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("classroomname"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
 				return it, err
 			}
+			it.Classroomname = data
 		}
 	}
 
@@ -5313,6 +5483,42 @@ func (ec *executionContext) _Todo(ctx context.Context, sel ast.SelectionSet, obj
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Todo")
+		case "Todoid":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Todo_Todoid(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "userid":
 			field := field
 
@@ -5354,12 +5560,17 @@ func (ec *executionContext) _Todo(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "period":
+			out.Values[i] = ec._Todo_period(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "completed":
 			out.Values[i] = ec._Todo_completed(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "subjectid":
+		case "subjectname":
 			field := field
 
 			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
@@ -5368,7 +5579,40 @@ func (ec *executionContext) _Todo(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Todo_subjectid(ctx, field, obj)
+				res = ec._Todo_subjectname(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "classroomname":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Todo_classroomname(ctx, field, obj)
 				return res
 			}
 
