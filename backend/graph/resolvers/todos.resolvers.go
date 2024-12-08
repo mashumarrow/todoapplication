@@ -15,6 +15,9 @@ import (
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input models.NewTodo) (*models.Todo, error) {
+	fmt.Println(&ctx)
+	fmt.Println(ctx)
+	fmt.Println("createtodo")
 	// 認証されているユーザーのuserIDを取得
 	userIDValue := ctx.Value("userID")
 	var userID uint64
@@ -35,10 +38,9 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input models.NewTodo)
 
 	//  認証済みのユーザーIDを使用して Todo を作成
 	todo := &models.Todo{
-		Title:     input.Title,
-		UserID:    uint(userID),
-		//Dayofweek: input.Dayofweek,
-		Period:    input.Period,
+		Title:  input.Title,
+		UserID: uint(userID),
+		Period:        input.Period,
 		Subjectname:   input.Subjectname,
 		Classroomname: input.Classroomname,
 	}
@@ -65,7 +67,7 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*models.Todo, error) {
 // Todo is the resolver for the todo field.
 func (r *queryResolver) Todo(ctx context.Context, userid string) (*models.Todo, error) {
 	var todo models.Todo
-	if err := r.DB.Where("user_id = ?", userid).First(&todo).Error; err != nil {
+	if err := r.DB.Where("UserID = ?", userid).First(&todo).Error; err != nil {
 		return nil, err
 	}
 	return &todo, nil
@@ -78,20 +80,24 @@ func (r *todoResolver) Todoid(ctx context.Context, obj *models.Todo) (string, er
 
 // Userid is the resolver for the userid field.
 func (r *todoResolver) Userid(ctx context.Context, obj *models.Todo) (string, error) {
-	return fmt.Sprintf("%d", obj.UserID), nil}
-
-// Subjectname is the resolver for the subjectname field.
-func (r *todoResolver) Subjectname(ctx context.Context, obj *models.Todo) (*string, error) {
-	result := fmt.Sprintf("%d", obj.Subjectname)
-return &result, nil
-}
-
-// Classroomname is the resolver for the classroomname field.
-func (r *todoResolver) Classroomname(ctx context.Context, obj *models.Todo) (*string, error) {
-	panic(fmt.Errorf("not implemented: Classroomname - classroomname"))
+	return fmt.Sprintf("%d", obj.UserID), nil
 }
 
 // Todo returns graph.TodoResolver implementation.
 func (r *Resolver) Todo() graph.TodoResolver { return &todoResolver{r} }
 
 type todoResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *todoResolver) Subjectname(ctx context.Context, obj *models.Todo) (*string, error) {
+	result := fmt.Sprintf("%d", obj.Subjectname)
+	return &result, nil
+}
+func (r *todoResolver) Classroomname(ctx context.Context, obj *models.Todo) (*string, error) {
+	panic(fmt.Errorf("not implemented: Classroomname - classroomname"))
+}
