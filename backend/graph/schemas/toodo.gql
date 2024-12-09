@@ -1,7 +1,7 @@
 type Todo {
-  Todoid: ID!
+  todoid: String
   userid: ID!
-  title: String!
+  title: String
   period: Int!
   completed: Boolean!
   subjectname: String
@@ -9,14 +9,16 @@ type Todo {
 }
 
 input NewTodo {
-  title: String!
+  title: String
   period: Int!
   subjectname: String!
   classroomname: String!
+  todoid: String
 }
 extend type Query {
   todos: [Todo!]!
   todo(userid: ID!): Todo!
+  todosid(todoid: String!): Todo!
 }
 
 extend type Mutation {
