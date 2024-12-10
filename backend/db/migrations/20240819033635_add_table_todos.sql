@@ -1,13 +1,15 @@
 -- +goose Up
 CREATE TABLE IF NOT EXISTS todos (
-    TodoID BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    UserID BIGINT UNSIGNED NOT NULL,
+    TodoID  VARCHAR(255)   PRIMARY KEY,
+    UserID BIGINT  NOT NULL,
     Title VARCHAR(255) NOT NULL,
     Completed BOOLEAN DEFAULT FALSE,
     Period INT NOT NULL,
-    ClassroomName VARCHAR(255),
-    SubjectName VARCHAR(255),
+    Classroomname VARCHAR(255),
+    Subjectname VARCHAR(255),
+    Dayofweek VARCHAR(255),
     FOREIGN KEY (UserID) REFERENCES users(UserID)
+    
 );
 -- +goose StatementBegin
 SELECT 'up SQL query';

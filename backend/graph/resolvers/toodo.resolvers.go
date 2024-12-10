@@ -43,7 +43,8 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input models.NewTodo)
 		Period:        input.Period,
 		Subjectname:   input.Subjectname,
 		Classroomname: input.Classroomname,
-		TodoID: 	   input.TodoID,	
+		TodoID:        input.TodoID,
+		Completed:     input.Completed,
 	}
 
 	// 5. データベースに新しい Todo を保存
@@ -78,17 +79,18 @@ func (r *queryResolver) Todo(ctx context.Context, userid string) (*models.Todo, 
 func (r *queryResolver) Todosid(ctx context.Context, todoid string) (*models.Todo, error) {
 	var todo models.Todo // 単一のTodoを取得するための変数
 
-    // todoid を使用してデータベースクエリを実行
-    if err := r.DB.Where("todoid = ?", todoid).First(&todo).Error; err != nil {
-        return nil, err // エラーの場合はnilとエラーを返す
-    }
+	// todoid を使用してデータベースクエリを実行
+	if err := r.DB.Where("todoid = ?", todoid).First(&todo).Error; err != nil {
+		return nil, err // エラーの場合はnilとエラーを返す
+	}
 
-    return &todo, nil // 取得したTodoを返す
-		}
+	return &todo, nil // 取得したTodoを返す
+}
 
 // Userid is the resolver for the userid field.
 func (r *todoResolver) Userid(ctx context.Context, obj *models.Todo) (string, error) {
-	return fmt.Sprintf("%d", obj.UserID), nil}
+	return fmt.Sprintf("%d", obj.UserID), nil
+}
 
 // Todo returns graph.TodoResolver implementation.
 func (r *Resolver) Todo() graph.TodoResolver { return &todoResolver{r} }

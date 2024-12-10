@@ -51,3 +51,28 @@ export const GET_SUBJECTS = gql`
     }
   }
 `;
+
+// Todoリストを取得するクエリ
+export const GET_TODOS = gql`
+  query GetTodos($todoid: String!) {
+    todos(todoid: $todoid) {
+      title
+      todoid
+    }
+  }
+`;
+
+// Todoを作成するミューテーション
+export const CREATE_TODO = gql`
+  mutation CreateTodo($input: NewTodo!) {
+    createTodo(input: $input) {
+      todoid
+      userid
+      title
+      completed
+      subjectname
+      period
+      classroomname
+    }
+  }
+`;

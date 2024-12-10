@@ -1,12 +1,14 @@
 "use client"; // 必須
 
 import React, { useState, useEffect } from "react";
-import { useMutation, ApolloError } from "@apollo/client";
+import { useMutation, useLazyQuery } from "@apollo/client";
 import { CREATE_SCHEDULE } from "../../../graphql/queries";
+import { GET_TODOS, CREATE_TODO } from "../../../graphql/queries";
 
 type ScheduleEntry = {
   subject: string;
   classroom: string;
+  todos?: string[]; // Todoリストを追加
 };
 
 type Schedule = {
@@ -26,52 +28,118 @@ const periods = [1, 2, 3, 4, 5, 6];
 export default function TimeTable() {
   const [schedule, setSchedule] = useState<Schedule>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTodoModalOpen, setIsTodoModalOpen] = useState(false); // Todoリスト用のモーダル
   const [selectedCell, setSelectedCell] = useState<{
     dayofweek: string;
     period: number;
-  }>({ dayofweek: "", period: 0 });
+  }>({
+    dayofweek: "",
+    period: 0,
+  });
   const [subject, setSubject] = useState("");
   const [classroom, setClassroom] = useState("");
-  const [savedToken, setSavedToken] = useState<string | null>(null); // stateに保存
+
+  const [todos, setTodos] = useState<string[]>([]);
+  const [newTodo, setNewTodo] = useState(""); // 新しいTodoアイテム用
+  const [savedToken, setSavedToken] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
-    setSavedToken(token); // stateにトークンを保存
-    console.log("取得したトークン:", token);
-    if (token) {
-      console.log("トークンが見つかりました:", token);
-    } else {
+    setSavedToken(token);
+    if (!token) {
       console.log("トークンが存在しません。ログインが必要です。");
     }
   }, []);
 
-  // Apollo Client: ミューテーション
+  // Apollo Client: ミューテーションとクエリ
   const [createSchedule] = useMutation(CREATE_SCHEDULE, {
     context: {
       headers: {
-        Authorization: savedToken ? `Bearer ${savedToken}` : undefined, // stateから取得
+        Authorization: savedToken ? `Bearer ${savedToken}` : undefined,
+      },
+    },
+  });
+  const [createTodo] = useMutation(CREATE_TODO, {
+    context: {
+      headers: {
+        Authorization: savedToken ? `Bearer ${savedToken}` : undefined,
       },
     },
   });
 
-  // モーダルを開く関数
+  //const [getTodos, { data }] = useLazyQuery(GET_TODOS); // Todoリスト取得クエリ
+
+  const generateTodoId = (dayofweek: string, period: number) =>
+    `${dayofweek}-${period}`;
+
+  // モーダルを開く関数（教科名・教室名の追加用）
   const openModal = (dayofweek: string, period: number) => {
     setSelectedCell({ dayofweek, period });
     const key = `${dayofweek}${period}`;
-    setSubject(schedule[key]?.subject || "");
-    setClassroom(schedule[key]?.classroom || "");
+    const cellData = schedule[key] || {};
+    setSubject(cellData.subject || "");
+    setClassroom(cellData.classroom || "");
     setIsModalOpen(true);
+  };
+
+  // Todoリスト用モーダルを開く関数
+  const openTodoModal = (dayofweek: string, period: number) => {
+    const todoid = generateTodoId(dayofweek, period);
+    setSelectedCell({ dayofweek, period });
+    const key = `${dayofweek}${period}`;
+    const cellData = schedule[key] || {};
+    setTodos(cellData.todos || []);
+    setIsTodoModalOpen(true);
+    console.log("Generated Todo ID:", todoid);
   };
 
   // モーダルを閉じる関数
   const closeModal = () => {
     setIsModalOpen(false);
+    setIsTodoModalOpen(false);
     setSelectedCell({ dayofweek: "", period: 0 });
-    setSubject(""); // フィールドをリセット
-    setClassroom(""); // フィールドをリセット
+    setSubject("");
+    setClassroom("");
+    setTodos([]);
   };
 
-  // スケジュールの更新
+  // Todoリストに新しいアイテムを追加
+  const addTodo = async () => {
+    if (newTodo.trim() !== "") {
+      try {
+        // if (!savedToken) {
+        //   console.error("トークンが見つかりません。ログインが必要です。");
+        //   return;
+        // }
+
+        const { data } = await createTodo({
+          variables: {
+            input: {
+              title: newTodo,
+              completed: false,
+              //dayofweek: selectedCell.dayofweek, // selectedCell から取得
+              period: selectedCell.period, // selectedCell から取得
+              todoid: `${selectedCell.dayofweek}-${selectedCell.period}`,
+            },
+          },
+        });
+
+        if (data && data.createTodo) {
+          console.log("Todo created:", data.createTodo);
+        } else {
+          console.error("Failed to create Todo.");
+        }
+      } catch (error) {
+        console.error("Error while creating Todo:", error);
+      }
+    }
+  };
+
+  // Todoリストからアイテムを削除
+  const removeTodo = (index: number) => {
+    setTodos((prevTodos) => prevTodos.filter((_, i) => i !== index));
+  };
+  // スケジュールの保存処理
   const handleSave = async () => {
     const key = `${selectedCell.dayofweek}${selectedCell.period}`;
 
@@ -98,19 +166,8 @@ export default function TimeTable() {
         closeModal();
       }
     } catch (error) {
-      console.log(error);
-      if (error instanceof ApolloError) {
-        console.error(
-          "GraphQLエラー:",
-          error.graphQLErrors?.map((err) => err.message) || "なし",
-          "ネットワークエラー:",
-          error.networkError || "なし"
-        );
-        alert("エラーが発生しました。詳細はコンソールを確認してください。");
-      } else {
-        console.error("予期しないエラー:", error);
-        alert("予期しないエラーが発生しました。");
-      }
+      console.error("エラー:", error);
+      alert("エラーが発生しました");
     }
   };
 
@@ -143,11 +200,20 @@ export default function TimeTable() {
                 return (
                   <td
                     key={index}
-                    className="border border-gray-300 w-24 h-24 bg-cream text-center cursor-pointer"
-                    onClick={() => openModal(day, period)}
+                    className="border border-gray-300 w-24 h-24 bg-cream relative text-center cursor-pointer"
+                    onClick={() => openModal(day, period)} // セルをクリックで教科名・教室名を追加
                   >
                     <div className="text-textbrown">{cellData.subject}</div>
                     <div className="text-textbrown">{cellData.classroom}</div>
+                    <button
+                      className="absolute bottom-1 right-1 text-gray-600"
+                      onClick={(e) => {
+                        e.stopPropagation(); // セルクリックイベントを止める
+                        openTodoModal(day, period); // Todoリスト追加用モーダルを開く
+                      }}
+                    >
+                      ＋
+                    </button>
                   </td>
                 );
               })}
@@ -156,12 +222,12 @@ export default function TimeTable() {
         </tbody>
       </table>
 
-      {/* モーダル */}
+      {/* 教科名・教室名追加用モーダル */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
           <div className="bg-cream p-6 rounded-md w-1/3">
             <h2 className="text-2xl mb-4 text-textbrown">
-              {selectedCell.dayofweek} {selectedCell.period}
+              {selectedCell.dayofweek} {selectedCell.period} 時限
             </h2>
             <div className="mb-4">
               <label className="block text-textbrown mb-2">教科名</label>
@@ -188,6 +254,53 @@ export default function TimeTable() {
               >
                 決定
               </button>
+              <button
+                className="bg-gray-300 px-4 py-2 rounded text-textbrown"
+                onClick={closeModal}
+              >
+                キャンセル
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Todoリスト追加用モーダル */}
+      {isTodoModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="bg-cream p-6 rounded-md w-1/3">
+            <h2 className="text-2xl mb-4 text-textbrown">
+              {selectedCell.dayofweek} {selectedCell.period} 時限 Todoリスト
+            </h2>
+            <div className="mb-4">
+              <ul>
+                {todos.map((todo, index) => (
+                  <li key={index} className="flex justify-between items-center">
+                    <span>{todo}</span>
+                    <button
+                      className="text-red-500 ml-2"
+                      onClick={() => removeTodo(index)}
+                    >
+                      削除
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <input
+                type="text"
+                className="w-full px-3 py-2 border border-gray-300 rounded mt-2"
+                placeholder="新しいTodoを追加"
+                value={newTodo}
+                onChange={(e) => setNewTodo(e.target.value)}
+              />
+              <button
+                onClick={addTodo}
+                className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
+              >
+                追加
+              </button>
+            </div>
+            <div className="flex justify-end">
               <button
                 className="bg-gray-300 px-4 py-2 rounded text-textbrown"
                 onClick={closeModal}
