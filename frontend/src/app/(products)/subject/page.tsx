@@ -129,13 +129,20 @@ export default function TimeTable() {
         });
 
         if (data && data.createTodo) {
-          console.log("Todo created:", data.createTodo);
-          setNewTodo(""); // 入力フィールドをクリア
-          // 必要に応じてローカルステートを更新
+          const key = `${selectedCell.dayofweek}${selectedCell.period}`;
+
+          // scheduleを更新
+          setSchedule((prevSchedule) => ({
+            ...prevSchedule,
+            [key]: {
+              ...prevSchedule[key],
+              todos: [...(prevSchedule[key]?.todos || []), newTodo],
+            },
+          }));
+
+          // ローカルのtodosも即時更新
           setTodos((prevTodos) => [...prevTodos, newTodo]);
-        } else {
-          console.error("Todoの作成に失敗しました");
-          alert("Todoの作成中にエラーが発生しました");
+          setNewTodo(""); // 入力フィールドをクリア
         }
       } catch (error) {
         console.error("Todo作成エラー:", error);
@@ -146,6 +153,28 @@ export default function TimeTable() {
 
   // Todoリストからアイテムを削除
   const removeTodo = (index: number) => {
+    const key = `${selectedCell.dayofweek}${selectedCell.period}`;
+
+    setSchedule((prevSchedule) => {
+      if (!prevSchedule[key] || !prevSchedule[key].todos) {
+        console.warn(`Key "${key}" or todos is undefined.`);
+        return prevSchedule; // 何も変更せずに返す
+      }
+
+      const updatedTodos = prevSchedule[key].todos.filter(
+        (_, i) => i !== index
+      );
+
+      return {
+        ...prevSchedule,
+        [key]: {
+          ...prevSchedule[key],
+          todos: updatedTodos,
+        },
+      };
+    });
+
+    // ローカルのtodosも更新
     setTodos((prevTodos) => prevTodos.filter((_, i) => i !== index));
   };
   // スケジュールの保存処理
