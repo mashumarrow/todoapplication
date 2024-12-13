@@ -49,8 +49,8 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input *models.NewTodo
 
 	// 5. データベースに新しい Todo を保存
 	if err := r.DB.Create(todo).Error; err != nil {
-		fmt.Printf("Failed to create Todo in DB: %v\n", err) 
-        return nil, fmt.Errorf("failed to save todo to the database")
+		fmt.Printf("Failed to create Todo in DB: %v\n", err)
+		return nil, fmt.Errorf("failed to save todo to the database")
 	}
 
 	return todo, nil

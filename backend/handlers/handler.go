@@ -69,25 +69,25 @@ func GetUserHandler(db *gorm.DB) http.HandlerFunc {
     }
 }
 
-//新しいTodoを作成するハンドラー
-func CreateTodoHandler(db *gorm.DB) http.HandlerFunc {
-    return func(w http.ResponseWriter, r *http.Request){
-        var newTodo models.NewTodo
-        if err := json.NewDecoder(r.Body).Decode(&newTodo); err != nil{
-            http.Error(w, err.Error(), http.StatusBadRequest)
-            return
-        }
-        todo := models.Todo{
-			Title:     newTodo.Title,
-        }
-        if err := db.Create(&todo).Error; err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-    }
-        w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(todo)
-}
-}
+// //新しいTodoを作成するハンドラー
+// func CreateTodoHandler(db *gorm.DB) http.HandlerFunc {
+//     return func(w http.ResponseWriter, r *http.Request){
+//         var newTodo models.NewTodo
+//         if err := json.NewDecoder(r.Body).Decode(&newTodo); err != nil{
+//             http.Error(w, err.Error(), http.StatusBadRequest)
+//             return
+//         }
+//         todo := models.Todo{
+// 			Title:     title,
+//         }
+//         if err := db.Create(&todo).Error; err != nil {
+// 			http.Error(w, err.Error(), http.StatusInternalServerError)
+// 			return
+//     }
+//         w.WriteHeader(http.StatusCreated)
+// 		json.NewEncoder(w).Encode(todo)
+// }
+// }
 
 // すべてのTodoを取得するハンドラー
 func GetTodosHandler(db *gorm.DB) http.HandlerFunc {
