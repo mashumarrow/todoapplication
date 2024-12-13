@@ -15,12 +15,11 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"gorm.io/gorm"
 
-    "github.com/gorilla/sessions"
-    "context"
-    "github.com/dgrijalva/jwt-go"
+	"context"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/sessions"
 )
-
-
 
 // NewGraphQLHandler はGraphQLサーバーのハンドラーを作成
 func NewGraphQLHandler(db *gorm.DB) http.Handler {
@@ -133,7 +132,8 @@ func CreateSubjectHandler(db *gorm.DB) http.HandlerFunc {
 
 var store = sessions.NewCookieStore([]byte("your_secret_key"))
 
-// JWT認証用のミドルウェア
+
+   // JWT認証用のミドルウェア
 func Middleware(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         // JWT トークンを Authorization ヘッダーから取得
@@ -154,11 +154,28 @@ func Middleware(next http.Handler) http.Handler {
 
         if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
             userID := uint(claims["user_id"].(float64)) // JWTからUserIDを取得
-            ctx := context.WithValue(r.Context(), "userID", userID) // context にユーザーIDを追加
+
+            // セッションを取得または作成
+            session, err := store.Get(r, "session-name")
+            if err != nil {
+                http.Error(w, "Failed to create session", http.StatusInternalServerError)
+                return
+            }
+
+            // セッションにユーザーIDを保存
+            session.Values["userID"] = userID
+            err = session.Save(r, w)
+            if err != nil {
+                http.Error(w, "Failed to save session", http.StatusInternalServerError)
+                return
+            }
+
+            // context にユーザーIDを追加
+            ctx := context.WithValue(r.Context(), "userID", userID)
             next.ServeHTTP(w, r.WithContext(ctx))
         } else {
             http.Error(w, "Unauthorized", http.StatusUnauthorized)
             return
         }
     })
-}
+};

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useMutation, useLazyQuery } from "@apollo/client";
 import { CREATE_SCHEDULE } from "../../../graphql/queries";
 import { GET_TODOS, CREATE_TODO } from "../../../graphql/queries";
+import { ApolloError } from "@apollo/client";
 
 type ScheduleEntry = {
   subject: string;
@@ -118,19 +119,27 @@ export default function TimeTable() {
               title: newTodo,
               completed: false,
               //dayofweek: selectedCell.dayofweek, // selectedCell から取得
-              period: selectedCell.period, // selectedCell から取得
+              //period: selectedCell.period, // selectedCell から取得
               todoid: `${selectedCell.dayofweek}-${selectedCell.period}`,
+              period: parseInt(selectedCell.period.toString(), 10),
+              //subjectname: subject,
+              //classroomname: classroom,
             },
           },
         });
 
         if (data && data.createTodo) {
           console.log("Todo created:", data.createTodo);
+          setNewTodo(""); // 入力フィールドをクリア
+          // 必要に応じてローカルステートを更新
+          setTodos((prevTodos) => [...prevTodos, newTodo]);
         } else {
-          console.error("Failed to create Todo.");
+          console.error("Todoの作成に失敗しました");
+          alert("Todoの作成中にエラーが発生しました");
         }
       } catch (error) {
-        console.error("Error while creating Todo:", error);
+        console.error("Todo作成エラー:", error);
+        alert("Todoの作成中にエラーが発生しました");
       }
     }
   };

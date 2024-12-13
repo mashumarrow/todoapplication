@@ -11,9 +11,10 @@ type Todo {
 input NewTodo {
   title: String
   period: Int!
-  subjectname: String!
-  classroomname: String!
+  subjectname: String
+  classroomname: String
   todoid: String
+  completed: Boolean!
 }
 extend type Query {
   todos: [Todo!]!
@@ -22,5 +23,5 @@ extend type Query {
 }
 
 extend type Mutation {
-  createTodo(input: NewTodo!): Todo!
+  createTodo(input: NewTodo): Todo!
 }

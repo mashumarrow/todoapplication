@@ -14,7 +14,7 @@ import (
 )
 
 // CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input models.NewTodo) (*models.Todo, error) {
+func (r *mutationResolver) CreateTodo(ctx context.Context, input *models.NewTodo) (*models.Todo, error) {
 	fmt.Println(&ctx)
 	fmt.Println(ctx)
 	fmt.Println("createtodo")
@@ -49,7 +49,8 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input models.NewTodo)
 
 	// 5. データベースに新しい Todo を保存
 	if err := r.DB.Create(todo).Error; err != nil {
-		return nil, err
+		fmt.Printf("Failed to create Todo in DB: %v\n", err) 
+        return nil, fmt.Errorf("failed to save todo to the database")
 	}
 
 	return todo, nil

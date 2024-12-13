@@ -60,7 +60,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateClassroom func(childComplexity int, input model.NewClassroom) int
 		CreateSubject   func(childComplexity int, input model.NewSubject) int
-		CreateTodo      func(childComplexity int, input models.NewTodo) int
+		CreateTodo      func(childComplexity int, input *models.NewTodo) int
 		Createschedule  func(childComplexity int, input model.NewSchedule) int
 		LoginUser       func(childComplexity int, name string, password string) int
 		RegisterUser    func(childComplexity int, input model.NewUser) int
@@ -119,7 +119,7 @@ type MutationResolver interface {
 	CreateClassroom(ctx context.Context, input model.NewClassroom) (*models.Classroom, error)
 	Createschedule(ctx context.Context, input model.NewSchedule) (*models.Schedule, error)
 	CreateSubject(ctx context.Context, input model.NewSubject) (*models.Subject, error)
-	CreateTodo(ctx context.Context, input models.NewTodo) (*models.Todo, error)
+	CreateTodo(ctx context.Context, input *models.NewTodo) (*models.Todo, error)
 	RegisterUser(ctx context.Context, input model.NewUser) (*models.User, error)
 	LoginUser(ctx context.Context, name string, password string) (*models.User, error)
 }
@@ -216,7 +216,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateTodo(childComplexity, args["input"].(models.NewTodo)), true
+		return e.complexity.Mutation.CreateTodo(childComplexity, args["input"].(*models.NewTodo)), true
 
 	case "Mutation.createschedule":
 		if e.complexity.Mutation.Createschedule == nil {
@@ -660,10 +660,10 @@ func (ec *executionContext) field_Mutation_createSubject_args(ctx context.Contex
 func (ec *executionContext) field_Mutation_createTodo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 models.NewTodo
+	var arg0 *models.NewTodo
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewTodo2githubᚗcomᚋmashumarrowᚋtodoapplicationᚋbackendᚋmodelsᚐNewTodo(ctx, tmp)
+		arg0, err = ec.unmarshalONewTodo2ᚖgithubᚗcomᚋmashumarrowᚋtodoapplicationᚋbackendᚋmodelsᚐNewTodo(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1162,7 +1162,7 @@ func (ec *executionContext) _Mutation_createTodo(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateTodo(rctx, fc.Args["input"].(models.NewTodo))
+		return ec.resolvers.Mutation().CreateTodo(rctx, fc.Args["input"].(*models.NewTodo))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4836,7 +4836,7 @@ func (ec *executionContext) unmarshalInputNewTodo(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "period", "subjectname", "classroomname", "todoid"}
+	fieldsInOrder := [...]string{"title", "period", "subjectname", "classroomname", "todoid", "completed"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4859,14 +4859,14 @@ func (ec *executionContext) unmarshalInputNewTodo(ctx context.Context, obj inter
 			it.Period = data
 		case "subjectname":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subjectname"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Subjectname = data
 		case "classroomname":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("classroomname"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4878,6 +4878,13 @@ func (ec *executionContext) unmarshalInputNewTodo(ctx context.Context, obj inter
 				return it, err
 			}
 			it.TodoID = data
+		case "completed":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("completed"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Completed = data
 		}
 	}
 
@@ -6187,11 +6194,6 @@ func (ec *executionContext) unmarshalNNewSubject2githubᚗcomᚋmashumarrowᚋto
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNNewTodo2githubᚗcomᚋmashumarrowᚋtodoapplicationᚋbackendᚋmodelsᚐNewTodo(ctx context.Context, v interface{}) (models.NewTodo, error) {
-	res, err := ec.unmarshalInputNewTodo(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNNewUser2githubᚗcomᚋmashumarrowᚋtodoapplicationᚋbackendᚋgraphᚋmodelᚐNewUser(ctx context.Context, v interface{}) (model.NewUser, error) {
 	res, err := ec.unmarshalInputNewUser(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -6693,6 +6695,14 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	}
 	res := graphql.MarshalID(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalONewTodo2ᚖgithubᚗcomᚋmashumarrowᚋtodoapplicationᚋbackendᚋmodelsᚐNewTodo(ctx context.Context, v interface{}) (*models.NewTodo, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputNewTodo(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
