@@ -46,6 +46,7 @@ type ResolverRoot interface {
 	Schedule() ScheduleResolver
 	Subject() SubjectResolver
 	Todo() TodoResolver
+	NewTodo() NewTodoResolver
 }
 
 type DirectiveRoot struct {
@@ -147,6 +148,10 @@ type SubjectResolver interface {
 }
 type TodoResolver interface {
 	Userid(ctx context.Context, obj *models.Todo) (string, error)
+}
+
+type NewTodoResolver interface {
+	Title(ctx context.Context, obj *models.NewTodo, data *string) error
 }
 
 type executableSchema struct {
@@ -4845,11 +4850,13 @@ func (ec *executionContext) unmarshalInputNewTodo(ctx context.Context, obj inter
 		switch k {
 		case "title":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			data, err := ec.unmarshalOString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Title = data
+			if err = ec.resolvers.NewTodo().Title(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "period":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("period"))
 			data, err := ec.unmarshalNInt2int(ctx, v)

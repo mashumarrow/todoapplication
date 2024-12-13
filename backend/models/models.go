@@ -30,7 +30,8 @@ type Schedule struct {
 }
 
 type Todo struct {
-	TodoID        string `gorm:"primaryKey;column:TodoID"`
+	ID            uint   `gorm:"primaryKey;autoIncrement;column:ID"`
+	TodoID        string `gorm:"column:TodoID"`
 	Title         string `gorm:"column:Title"`
 	Completed     bool   `gorm:"column:Completed"`
 	UserID        uint   `gorm:"column:UserID"`
