@@ -52,16 +52,6 @@ export const GET_SUBJECTS = gql`
   }
 `;
 
-// Todoリストを取得するクエリ
-export const GET_TODOS = gql`
-  query GetTodos($todoid: String!) {
-    todos(todoid: $todoid) {
-      title
-      todoid
-    }
-  }
-`;
-
 // Todoを作成するミューテーション
 export const CREATE_TODO = gql`
   mutation CreateTodo($input: NewTodo!) {
@@ -73,6 +63,21 @@ export const CREATE_TODO = gql`
       subjectname
       period
       classroomname
+    }
+  }
+`;
+
+export const GET_TODOS = gql`
+  query GetTodos {
+    todos {
+      id
+      todoid
+      userid
+      title
+      completed
+      subjectname
+      classroomname
+      period
     }
   }
 `;
