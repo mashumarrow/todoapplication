@@ -6,11 +6,13 @@ package resolvers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 
 	"github.com/mashumarrow/todoapplication/backend/graph"
 	"github.com/mashumarrow/todoapplication/backend/models"
+	"gorm.io/gorm"
 )
 
 // CreateTodo is the resolver for the createTodo field.
@@ -56,6 +58,37 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input *models.NewTodo
 	return todo, nil
 }
 
+// UpdateTodo is the resolver for the updateTodo field.
+func (r *mutationResolver) UpdateTodo(ctx context.Context, title string, completed bool) (*models.Todo, error) {
+	fmt.Println("updatetodo")
+	fmt.Println("UpdateTodo called with title:", title)
+
+	// `title`が空の場合はエラーを返す
+	if title == "" {
+		return nil, fmt.Errorf("title cannot be empty")
+	}
+
+	var todo models.Todo
+
+	// `title`を条件に検索
+	if err := r.DB.First(&todo, "title = ?", title).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			fmt.Println("Todo not found in database")
+			return nil, fmt.Errorf("Todo with title '%s' not found", title)
+		}
+		return nil, fmt.Errorf("failed to retrieve Todo: %v", err)
+	}
+
+	// `completed`を更新
+	todo.Completed = completed
+	if err := r.DB.Save(&todo).Error; err != nil {
+		fmt.Printf("Failed to update Todo: %v\n", err)
+		return nil, fmt.Errorf("failed to update Todo: %v", err)
+	}
+	fmt.Println("Todo updated successfully:", todo)
+	return &todo, nil
+}
+
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*models.Todo, error) {
 	var todos []*models.Todo
@@ -97,3 +130,16 @@ func (r *todoResolver) Userid(ctx context.Context, obj *models.Todo) (string, er
 func (r *Resolver) Todo() graph.TodoResolver { return &todoResolver{r} }
 
 type todoResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *todoResolver) ID(ctx context.Context, obj *models.Todo) (string, error) {
+	if obj == nil {
+		return "", fmt.Errorf("Todo object is nil")
+	}
+	return  obj.TodoID,  nil
+}

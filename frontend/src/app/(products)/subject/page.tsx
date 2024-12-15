@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { useMutation, useLazyQuery } from "@apollo/client";
 import { CREATE_SCHEDULE } from "../../../graphql/queries";
-import { GET_TODOS, CREATE_TODO } from "../../../graphql/queries";
+import { CREATE_TODO } from "../../../graphql/queries";
 import { ApolloError } from "@apollo/client";
+import { title } from "process";
 
 type ScheduleEntry = {
   subject: string;

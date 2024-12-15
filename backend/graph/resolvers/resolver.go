@@ -4,14 +4,14 @@ package resolvers
 //
 // It serves as dependency injection for your app, add any dependencies you require here.
 import (
-	"context"
-	"fmt"
+	//"context"
+	//"fmt"
 
-	"github.com/mashumarrow/todoapplication/backend/graph"
+	//"github.com/mashumarrow/todoapplication/backend/graph"
 
 	// 	"github.com/mashumarrow/todoapplication/backend/graph/model"
 	// 	"github.com/mashumarrow/todoapplication/backend/models"
-	"github.com/mashumarrow/todoapplication/backend/models"
+	//"github.com/mashumarrow/todoapplication/backend/models"
 	"gorm.io/gorm"
 )
 type Resolver struct{
@@ -26,15 +26,15 @@ type Resolver struct{
 //     return nil
 // }
 
-type NewTodoResolverImpl struct{}
+//type NewTodoResolverImpl struct{}
 
-func (r *NewTodoResolverImpl) Title(ctx context.Context, obj *models.NewTodo, data *string) error {
-    if data == nil {
-        return fmt.Errorf("data is nil")
-    }
-    obj.Title = *data
-    return nil
-}
-func (r *Resolver) NewTodo() graph.NewTodoResolver {
-    return &NewTodoResolverImpl{}
-}
+// func (r *NewTodoResolverImpl) Title(ctx context.Context, obj *models.NewTodo, data *string) error {
+//     if data == nil {
+//         return fmt.Errorf("data is nil")
+//     }
+//     obj.Title = *data
+//     return nil
+// }
+// func (r *Resolver) NewTodo() graph.NewTodoResolver {
+//     return &NewTodoResolverImpl{}
+// }
