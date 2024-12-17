@@ -61,13 +61,10 @@ export default function TimeTable() {
   const [getTodos, { data }] = useLazyQuery<{ todos: Todo[] }>(GET_TODOS, {
     fetchPolicy: "cache-and-network", // キャッシュを優先し、必要に応じてネットワークから取得
   });
-  const {
-    data: scheduleData,
-    loading,
-    error,
-  } = useQuery(GET_SCHEDULES, {
+  const { data: scheduleData } = useQuery(GET_SCHEDULES, {
     variables: { userid },
-    skip: !userid, // ユーザーIDがない場合はスキップ
+    skip: !userid,
+    fetchPolicy: "network-only", // キャッシュを使わず、毎回ネットワークからデータを取得
   });
   useEffect(() => {
     const token = localStorage.getItem("authToken");
