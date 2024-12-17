@@ -117,13 +117,17 @@ export default function TimeTable() {
     if (data && data.todos) {
       const newSchedule: Schedule = {};
       data.todos.forEach((todo) => {
-        const key = `${todo.period}-${todo.subjectname}`;
-        newSchedule[key] = {
-          subject: todo.subjectname || "",
-          classroom: todo.classroomname || "",
-          todos: [...(newSchedule[key]?.todos || []), todo.title],
-        };
+        const key = todo.todoid; // todoidがキーとして使われる
+        if (!newSchedule[key]) {
+          newSchedule[key] = {
+            subject: "", // 初期値として空文字を設定
+            classroom: "",
+            todos: [],
+          };
+        }
+        newSchedule[key].todos?.push(todo.title);
       });
+
       setSchedule(newSchedule);
       console.log("更新されたスケジュール:", newSchedule);
     }
@@ -164,7 +168,7 @@ export default function TimeTable() {
   const openTodoModal = (dayofweek: string, period: number) => {
     const todoid = generateTodoId(dayofweek, period);
     setSelectedCell({ dayofweek, period });
-    const key = `${dayofweek}${period}`;
+    const key = `${dayofweek}-${period}`;
     const cellData = schedule[key] || {};
     setTodos(cellData.todos || []);
     setIsTodoModalOpen(true);
@@ -206,7 +210,7 @@ export default function TimeTable() {
         });
 
         if (data && data.createTodo) {
-          const key = `${selectedCell.dayofweek}${selectedCell.period}`;
+          const key = `${selectedCell.dayofweek}-${selectedCell.period}`;
 
           // scheduleを更新
           setSchedule((prevSchedule) => ({
@@ -230,7 +234,7 @@ export default function TimeTable() {
 
   // Todoリストからアイテムを削除
   const removeTodo = (index: number) => {
-    const key = `${selectedCell.dayofweek}${selectedCell.period}`;
+    const key = `${selectedCell.dayofweek}-${selectedCell.period}`;
 
     setSchedule((prevSchedule) => {
       if (!prevSchedule[key] || !prevSchedule[key].todos) {
@@ -256,7 +260,7 @@ export default function TimeTable() {
   };
   // スケジュールの保存処理
   const handleSave = async () => {
-    const key = `${selectedCell.dayofweek}${selectedCell.period}`;
+    const key = `${selectedCell.dayofweek}-${selectedCell.period}`;
 
     try {
       const { data } = await createSchedule({
@@ -276,6 +280,7 @@ export default function TimeTable() {
           [key]: {
             subject,
             classroom,
+            todos: prevSchedule[key]?.todos || [],
           },
         }));
         closeModal();
@@ -310,7 +315,7 @@ export default function TimeTable() {
                 {period}
               </td>
               {days.map((day, index) => {
-                const cellKey = `${day}${period}`;
+                const cellKey = `${day}-${period}`;
                 const cellData = schedule[cellKey] || {};
                 return (
                   <td
@@ -320,6 +325,7 @@ export default function TimeTable() {
                   >
                     <div className="text-textbrown">{cellData.subject}</div>
                     <div className="text-textbrown">{cellData.classroom}</div>
+
                     <button
                       className="absolute bottom-1 right-1 text-gray-600"
                       onClick={(e) => {
