@@ -18,7 +18,7 @@ input NewTodo {
   completed: Boolean!
 }
 extend type Query {
-  todos: [Todo!]!
+  todos(userid: ID!): [Todo!]!
   todo(userid: ID!): Todo!
   todosid(todoid: String!): Todo!
 }

@@ -74,7 +74,7 @@ type ComplexityRoot struct {
 		Subject    func(childComplexity int, subjectid *string) int
 		Subjects   func(childComplexity int) int
 		Todo       func(childComplexity int, userid string) int
-		Todos      func(childComplexity int) int
+		Todos      func(childComplexity int, userid string) int
 		Todosid    func(childComplexity int, todoid string) int
 		User       func(childComplexity int, userid string) int
 		Users      func(childComplexity int) int
@@ -131,7 +131,7 @@ type QueryResolver interface {
 	Schedule(ctx context.Context, userid string) (*models.Schedule, error)
 	Subjects(ctx context.Context) ([]*models.Subject, error)
 	Subject(ctx context.Context, subjectid *string) (*models.Subject, error)
-	Todos(ctx context.Context) ([]*models.Todo, error)
+	Todos(ctx context.Context, userid string) ([]*models.Todo, error)
 	Todo(ctx context.Context, userid string) (*models.Todo, error)
 	Todosid(ctx context.Context, todoid string) (*models.Todo, error)
 	Users(ctx context.Context) ([]*models.User, error)
@@ -329,7 +329,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Todos(childComplexity), true
+		args, err := ec.field_Query_todos_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Todos(childComplexity, args["userid"].(string)), true
 
 	case "Query.todosid":
 		if e.complexity.Query.Todosid == nil {
@@ -795,6 +800,21 @@ func (ec *executionContext) field_Query_subject_args(ctx context.Context, rawArg
 }
 
 func (ec *executionContext) field_Query_todo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["userid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userid"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["userid"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_todos_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -1719,7 +1739,7 @@ func (ec *executionContext) _Query_todos(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Todos(rctx)
+		return ec.resolvers.Query().Todos(rctx, fc.Args["userid"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1736,7 +1756,7 @@ func (ec *executionContext) _Query_todos(ctx context.Context, field graphql.Coll
 	return ec.marshalNTodo2ᚕᚖgithubᚗcomᚋmashumarrowᚋtodoapplicationᚋbackendᚋmodelsᚐTodoᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_todos(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_todos(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -1763,6 +1783,17 @@ func (ec *executionContext) fieldContext_Query_todos(_ context.Context, field gr
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Todo", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_todos_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }

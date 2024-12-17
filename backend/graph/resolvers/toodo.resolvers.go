@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/mashumarrow/todoapplication/backend/graph"
@@ -59,22 +60,20 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input *models.NewTodo
 }
 
 // Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*models.Todo, error) {
+func (r *queryResolver) Todos(ctx context.Context, userid string) ([]*models.Todo, error) {
 	var todos []*models.Todo
-
-	// データベースからすべてのTodoを取得
-	if err := r.DB.Find(&todos).Error; err != nil {
-		return nil, fmt.Errorf("failed to retrieve todos: %w", err)
-	}
-
-	return todos, nil
+    if err := r.DB.Where("userid = ?", userid).Find(&todos).Error; err != nil {
+        return nil, errors.New("Todoデータの取得に失敗しました")
+    }
+    return todos, nil
 }
 
 // Todo is the resolver for the todo field.
 func (r *queryResolver) Todo(ctx context.Context, userid string) (*models.Todo, error) {
 	var todo models.Todo
-	if err := r.DB.Where("UserID = ?", userid).First(&todo).Error; err != nil {
-		return nil, err
+	if err := r.DB.Where("userid = ?", userid).First(&todo).Error; err != nil {
+		log.Println("Todoデータの取得エラー:", err)
+		return nil, errors.New("Todoが見つかりません")
 	}
 	return &todo, nil
 }

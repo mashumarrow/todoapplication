@@ -20,6 +20,11 @@ import (
 
 // RegisterUser is the resolver for the registerUser field.
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.NewUser) (*models.User, error) {
+	var existingUser models.User
+	if err := r.DB.Where("name = ?", input.Name).First(&existingUser).Error; err == nil {
+		return nil, errors.New("すでに登録されている名前です")
+	}
+
 	// パスワードをハッシュ化
 	hashedPassword, err := hashPassword(input.Password)
 	if err != nil {

@@ -1,11 +1,9 @@
 "use client"; // 必須
 
 import React, { useState, useEffect } from "react";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 import { CREATE_SCHEDULE, GET_TODOS } from "../../../graphql/queries";
 import { CREATE_TODO } from "../../../graphql/queries";
-import { ApolloError } from "@apollo/client";
-import { title } from "process";
 
 type ScheduleEntry = {
   subject: string;
@@ -16,7 +14,16 @@ type ScheduleEntry = {
 type Schedule = {
   [key: string]: ScheduleEntry;
 };
-
+type Todo = {
+  id: string;
+  todoid: string;
+  userid: string;
+  title: string;
+  period: number;
+  completed: boolean;
+  subjectname?: string;
+  classroomname?: string;
+};
 const days = [
   "Monday",
   "Tuesday",
@@ -31,6 +38,7 @@ export default function TimeTable() {
   const [schedule, setSchedule] = useState<Schedule>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTodoModalOpen, setIsTodoModalOpen] = useState(false); // Todoリスト用のモーダル
+
   const [selectedCell, setSelectedCell] = useState<{
     dayofweek: string;
     period: number;
@@ -45,13 +53,88 @@ export default function TimeTable() {
   const [newTodo, setNewTodo] = useState(""); // 新しいTodoアイテム用
   const [savedToken, setSavedToken] = useState<string | null>(null);
 
+  const [getTodos, { data, loading, error }] = useLazyQuery<{ todos: Todo[] }>(
+    GET_TODOS,
+    {
+      fetchPolicy: "cache-and-network", // キャッシュを優先し、必要に応じてネットワークから取得
+    }
+  );
+
   useEffect(() => {
     const token = localStorage.getItem("authToken");
-    setSavedToken(token);
+    const userid = localStorage.getItem("userid");
+
     if (!token) {
-      console.log("トークンが存在しません。ログインが必要です。");
+      console.error("トークンが見つかりません。ログインが必要です。");
+      return;
     }
+
+    if (!userid) {
+      console.error("ユーザーIDが見つかりません。ログインが必要です。");
+      return;
+    }
+
+    console.log("取得したトークン:", token);
+    console.log("取得したユーザーID:", userid);
+
+    setSavedToken(token);
+    fetchTodos(userid);
   }, []);
+
+  const fetchTodos = async (userid: string) => {
+    try {
+      const { data, error } = await getTodos({
+        variables: { userid },
+        context: {
+          headers: { Authorization: `Bearer ${savedToken}` },
+        },
+      });
+
+      if (error) {
+        console.error("GraphQLエラー:", error);
+        return;
+      }
+
+      console.log("GraphQLリクエスト結果:", data);
+      if (data && data.todos) {
+        console.log("取得したTodoデータ:", data.todos);
+      } else {
+        console.warn("Todoデータが取得できませんでした。");
+      }
+    } catch (e) {
+      console.error("データ取得エラー:", e);
+    }
+  };
+
+  useEffect(() => {
+    if (error) {
+      console.error("GraphQLエラー:", error);
+    }
+    if (data) {
+      console.log("取得したデータ:", data);
+    }
+  }, [data, error]);
+
+  useEffect(() => {
+    if (data && data.todos) {
+      console.log("取得したTodoデータ:", data.todos);
+      const newSchedule: Schedule = {};
+      data.todos.forEach((todo) => {
+        const key = `${todo.period}-${todo.subjectname}`;
+        newSchedule[key] = {
+          subject: todo.subjectname || "",
+          classroom: todo.classroomname || "",
+          todos: [...(newSchedule[key]?.todos || []), todo.title],
+        };
+      });
+      setSchedule(newSchedule);
+    } else if (data === undefined) {
+      console.warn("GraphQLレスポンスが `undefined` です。");
+    }
+  }, [data]);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
   // Apollo Client: ミューテーションとクエリ
   const [createSchedule] = useMutation(CREATE_SCHEDULE, {

@@ -1,11 +1,11 @@
 "use client";
-import { ApolloProvider } from "@apollo/client";
+import { ApolloProvider, useLazyQuery } from "@apollo/client";
 import client from "../../../lib/apollo"; // apollo.tsからclientをインポート
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import "../../globals.css";
 import { useMutation } from "@apollo/client";
-import { REGISTER_USER, LOGIN_USER } from "../../../graphql/queries";
+import { REGISTER_USER, LOGIN_USER, GET_TODOS } from "../../../graphql/queries";
 
 export default function Home() {
   const [name, setName] = useState("");
@@ -25,6 +25,11 @@ export default function Home() {
       errorPolicy: "all",
     }
   );
+  // ユーザーのTodoデータをフェッチするLazyQuery
+  const [
+    getTodos,
+    { data: todosData, loading: todosLoading, error: todosError },
+  ] = useLazyQuery(GET_TODOS);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,13 +53,34 @@ export default function Home() {
       });
 
       // loginResponse が正しく返ってきているか確認
-      console.log("Login response:", loginResponse); // ここでログを確認
+      console.log("Login response:", JSON.stringify(loginResponse, null, 2));
 
       // トークンがある場合はローカルストレージに保存
       if (loginResponse?.loginUser?.token) {
         localStorage.setItem("authToken", loginResponse.loginUser.token);
+        localStorage.setItem("userid", loginResponse.loginUser.userid);
         console.log("保存されたトークン:", localStorage.getItem("authToken"));
-        alert("ログイン成功！");
+        console.log("保存されたユーザーID:", localStorage.getItem("userid"));
+
+        alert("ログイン成功");
+
+        // ユーザーIDを取得し、Todoデータをフェッチ
+        const userid = loginResponse.loginUser.userid;
+        console.log("取得したユーザーID:", userid);
+
+        // getTodos クエリを実行してデータを取得
+        const { data: todosResponse } = await getTodos({
+          variables: { userid },
+        });
+
+        // データが正しく取得されているか確認
+        if (todosResponse?.todos) {
+          console.log("取得したTodoデータ:", todosResponse.todos);
+        } else {
+          console.error("Todoデータが取得できませんでした:", todosResponse);
+        }
+
+        // ページ遷移
         router.push("/subject");
       } else {
         alert("ログイン失敗");

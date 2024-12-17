@@ -68,8 +68,8 @@ export const CREATE_TODO = gql`
 `;
 
 export const GET_TODOS = gql`
-  query GetTodos {
-    todos {
+  query GetTodos($userid: ID!) {
+    todos(userid: $userid) {
       id
       todoid
       userid
