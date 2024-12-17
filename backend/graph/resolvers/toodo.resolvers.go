@@ -62,10 +62,10 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input *models.NewTodo
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context, userid string) ([]*models.Todo, error) {
 	var todos []*models.Todo
-    if err := r.DB.Where("userid = ?", userid).Find(&todos).Error; err != nil {
-        return nil, errors.New("Todoデータの取得に失敗しました")
-    }
-    return todos, nil
+	if err := r.DB.Where("userid = ?", userid).Find(&todos).Error; err != nil {
+		return nil, errors.New("Todoデータの取得に失敗しました")
+	}
+	return todos, nil
 }
 
 // Todo is the resolver for the todo field.

@@ -24,7 +24,7 @@ input NewSchedule {
 }
 
 extend type Query {
-  schedules: [Schedule!]!
+  schedules(userid: ID!): [Schedule!]!
   schedule(userid: ID!): Schedule!
 }
 

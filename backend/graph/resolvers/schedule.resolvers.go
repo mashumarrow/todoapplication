@@ -63,11 +63,11 @@ func (r *mutationResolver) Createschedule(ctx context.Context, input model.NewSc
 }
 
 // Schedules is the resolver for the schedules field.
-func (r *queryResolver) Schedules(ctx context.Context) ([]*models.Schedule, error) {
+func (r *queryResolver) Schedules(ctx context.Context, userid string) ([]*models.Schedule, error) {
 	var schedules []*models.Schedule
 
-	// データベースからスケジュールを取得
-	if err := r.DB.Find(&schedules).Error; err != nil {
+	// データベースから特定のユーザーのスケジュールを取得
+	if err := r.DB.Where("userid = ?", userid).Find(&schedules).Error; err != nil {
 		return nil, fmt.Errorf("failed to retrieve schedules: %w", err)
 	}
 

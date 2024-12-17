@@ -31,18 +31,6 @@ export const CREATE_SCHEDULE = gql`
   }
 `;
 
-export const GET_SCHEDULES = gql`
-  query GetSchedules {
-    schedules {
-      userid
-      subjectname
-      classroomname
-      dayofweek
-      period
-    }
-  }
-`;
-
 export const GET_SUBJECTS = gql`
   query GetSubjects {
     subjects {
@@ -77,6 +65,19 @@ export const GET_TODOS = gql`
       completed
       subjectname
       classroomname
+      period
+    }
+  }
+`;
+
+export const GET_SCHEDULES = gql`
+  query GetSchedules($userid: ID!) {
+    schedules(userid: $userid) {
+      scheduleid
+      userid
+      subjectname
+      classroomname
+      dayofweek
       period
     }
   }

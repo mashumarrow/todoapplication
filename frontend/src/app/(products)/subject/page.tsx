@@ -2,7 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
-import { CREATE_SCHEDULE, GET_TODOS } from "../../../graphql/queries";
+import {
+  CREATE_SCHEDULE,
+  GET_TODOS,
+  GET_SCHEDULES,
+} from "../../../graphql/queries";
 import { CREATE_TODO } from "../../../graphql/queries";
 
 type ScheduleEntry = {
@@ -54,13 +58,17 @@ export default function TimeTable() {
   const [savedToken, setSavedToken] = useState<string | null>(null);
 
   const [userid, setUserid] = useState<string | null>(null);
-  const [getTodos, { data, loading, error }] = useLazyQuery<{ todos: Todo[] }>(
-    GET_TODOS,
-    {
-      fetchPolicy: "cache-and-network", // キャッシュを優先し、必要に応じてネットワークから取得
-    }
-  );
-
+  const [getTodos, { data }] = useLazyQuery<{ todos: Todo[] }>(GET_TODOS, {
+    fetchPolicy: "cache-and-network", // キャッシュを優先し、必要に応じてネットワークから取得
+  });
+  const {
+    data: scheduleData,
+    loading,
+    error,
+  } = useQuery(GET_SCHEDULES, {
+    variables: { userid },
+    skip: !userid, // ユーザーIDがない場合はスキップ
+  });
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     const storedUserid = localStorage.getItem("userid");
@@ -76,6 +84,7 @@ export default function TimeTable() {
       );
     }
   }, []);
+
   // トークンとユーザーIDが揃ったらデータを取得
   useEffect(() => {
     if (savedToken && userid) {
@@ -132,6 +141,32 @@ export default function TimeTable() {
       console.log("更新されたスケジュール:", newSchedule);
     }
   }, [data]);
+
+  // GET_SCHEDULESのデータを処理してスケジュールを作成
+  useEffect(() => {
+    if (scheduleData && scheduleData.schedules) {
+      console.log("取得したスケジュールデータ:", scheduleData.schedules);
+      const newSchedule: Schedule = {};
+
+      scheduleData.schedules.forEach((sch: any) => {
+        console.log("dayofweek:", sch.dayofweek, "period:", sch.period);
+        const key = `${sch.dayofweek}-${sch.period}`; // dayofweekとperiodでキーを作成
+        newSchedule[key] = {
+          subject: sch.subjectname || "", // subjectnameをセット
+          classroom: sch.classroomname || "", // classroomnameをセット
+          todos: schedule[key]?.todos || [], // 既存のtodosがあれば保持
+        };
+      });
+
+      // 既存のscheduleにマージする
+      setSchedule((prevSchedule) => ({
+        ...prevSchedule,
+        ...newSchedule,
+      }));
+
+      console.log("取得したスケジュールデータ:", newSchedule);
+    }
+  }, [scheduleData]);
 
   // Apollo Client: ミューテーションとクエリ
   const [createSchedule] = useMutation(CREATE_SCHEDULE, {
