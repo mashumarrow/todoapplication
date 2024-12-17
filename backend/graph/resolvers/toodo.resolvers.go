@@ -59,10 +59,30 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input *models.NewTodo
 	return todo, nil
 }
 
+// UpdateTodoCompleted is the resolver for the updateTodoCompleted field.
+func (r *mutationResolver) UpdateTodoCompleted(ctx context.Context, todoid string) (*models.Todo, error) {
+	var todo models.Todo
+
+	// 指定されたtodoidのTodoを検索
+	if err := r.DB.Where("todoid = ?", todoid).First(&todo).Error; err != nil {
+		return nil, fmt.Errorf("Todo not found: %w", err)
+	}
+
+	// completedをtrueに更新
+	todo.Completed = true
+
+	// データベースを更新
+	if err := r.DB.Save(&todo).Error; err != nil {
+		return nil, fmt.Errorf("failed to update Todo: %w", err)
+	}
+
+	return &todo, nil
+}
+
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context, userid string) ([]*models.Todo, error) {
 	var todos []*models.Todo
-	if err := r.DB.Where("userid = ?", userid).Find(&todos).Error; err != nil {
+	if err := r.DB.Where("userid = ? AND completed = ?", userid, false).Find(&todos).Error; err != nil {
 		return nil, errors.New("Todoデータの取得に失敗しました")
 	}
 	return todos, nil

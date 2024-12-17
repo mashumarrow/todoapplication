@@ -82,3 +82,13 @@ export const GET_SCHEDULES = gql`
     }
   }
 `;
+
+export const UPDATE_TODO_COMPLETED = gql`
+  mutation UpdateTodoCompleted($todoid: String!) {
+    updateTodoCompleted(todoid: $todoid) {
+      todoid
+      title
+      completed
+    }
+  }
+`;

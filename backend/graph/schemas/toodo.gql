@@ -25,4 +25,5 @@ extend type Query {
 
 extend type Mutation {
   createTodo(input: NewTodo): Todo!
+  updateTodoCompleted(todoid: String!): Todo!
 }

@@ -6,6 +6,7 @@ import {
   CREATE_SCHEDULE,
   GET_TODOS,
   GET_SCHEDULES,
+  UPDATE_TODO_COMPLETED,
 } from "../../../graphql/queries";
 import { CREATE_TODO } from "../../../graphql/queries";
 
@@ -264,31 +265,44 @@ export default function TimeTable() {
     }
   };
 
+  const [updateTodoCompleted] = useMutation(UPDATE_TODO_COMPLETED);
+
   // Todoリストからアイテムを削除
-  const removeTodo = (index: number) => {
+  const removeTodo = async (index: number) => {
     const key = `${selectedCell.dayofweek}-${selectedCell.period}`;
 
-    setSchedule((prevSchedule) => {
-      if (!prevSchedule[key] || !prevSchedule[key].todos) {
-        console.warn(`Key "${key}" or todos is undefined.`);
-        return prevSchedule; // 何も変更せずに返す
-      }
+    const todoTitle = todos[index];
 
-      const updatedTodos = prevSchedule[key].todos.filter(
-        (_, i) => i !== index
-      );
-
-      return {
-        ...prevSchedule,
-        [key]: {
-          ...prevSchedule[key],
-          todos: updatedTodos,
+    try {
+      // completedをtrueに更新
+      await updateTodoCompleted({
+        variables: {
+          todoid: key,
         },
-      };
-    });
+      });
 
-    // ローカルのtodosも更新
-    setTodos((prevTodos) => prevTodos.filter((_, i) => i !== index));
+      // ローカルのscheduleを更新
+      setSchedule((prevSchedule) => {
+        const currentSchedule = prevSchedule[key] || { todos: [] };
+
+        const updatedTodos = (currentSchedule.todos || []).filter(
+          (_, i) => i !== index
+        );
+
+        return {
+          ...prevSchedule,
+          [key]: {
+            ...currentSchedule,
+            todos: updatedTodos,
+          },
+        };
+      });
+
+      // ローカルのtodosも更新
+      setTodos((prevTodos) => prevTodos.filter((_, i) => i !== index));
+    } catch (error) {
+      console.error("Todo削除エラー:", error);
+    }
   };
   // スケジュールの保存処理
   const handleSave = async () => {
