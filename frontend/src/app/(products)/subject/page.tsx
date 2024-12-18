@@ -65,7 +65,7 @@ export default function TimeTable() {
   const { data: scheduleData } = useQuery(GET_SCHEDULES, {
     variables: { userid },
     skip: !userid,
-    fetchPolicy: "network-only", // キャッシュを使わず、毎回ネットワークからデータを取得
+    fetchPolicy: "cache-and-network", // キャッシュを使わず、毎回ネットワークからデータを取得
   });
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -446,10 +446,11 @@ export default function TimeTable() {
                   <li key={index} className="flex justify-between items-center">
                     <span>{todo}</span>
                     <button
-                      className="text-red-500 ml-2"
+                      className="w-8 h-8 rounded-full bg-pink px-2 py-1  mr-1 mb-1 text-textbrown"
+                      style={{ fontSize: "12px" }}
                       onClick={() => removeTodo(index)}
                     >
-                      削除
+                      済
                     </button>
                   </li>
                 ))}
@@ -461,20 +462,21 @@ export default function TimeTable() {
                 value={newTodo}
                 onChange={(e) => setNewTodo(e.target.value)}
               />
-              <button
-                onClick={addTodo}
-                className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
-              >
-                追加
-              </button>
-            </div>
-            <div className="flex justify-end">
-              <button
-                className="bg-gray-300 px-4 py-2 rounded text-textbrown"
-                onClick={closeModal}
-              >
-                キャンセル
-              </button>
+              <div className="flex justify-between items-center mt-4">
+                <button
+                  onClick={addTodo}
+                  className="bg-pink px-4 py-2 rounded  text-textbrown"
+                >
+                  追加
+                </button>
+
+                <button
+                  className="bg-gray-300 px-4 py-2 rounded text-textbrown"
+                  onClick={closeModal}
+                >
+                  キャンセル
+                </button>
+              </div>
             </div>
           </div>
         </div>
