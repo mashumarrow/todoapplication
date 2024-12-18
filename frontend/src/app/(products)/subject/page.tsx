@@ -278,6 +278,7 @@ export default function TimeTable() {
       await updateTodoCompleted({
         variables: {
           todoid: key,
+          title: todoTitle,
         },
       });
 

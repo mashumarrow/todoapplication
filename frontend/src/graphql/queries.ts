@@ -84,8 +84,8 @@ export const GET_SCHEDULES = gql`
 `;
 
 export const UPDATE_TODO_COMPLETED = gql`
-  mutation UpdateTodoCompleted($todoid: String!) {
-    updateTodoCompleted(todoid: $todoid) {
+  mutation UpdateTodoCompleted($todoid: String!, $title: String!) {
+    updateTodoCompleted(todoid: $todoid, title: $title) {
       todoid
       title
       completed

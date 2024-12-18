@@ -60,12 +60,15 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input *models.NewTodo
 }
 
 // UpdateTodoCompleted is the resolver for the updateTodoCompleted field.
-func (r *mutationResolver) UpdateTodoCompleted(ctx context.Context, todoid string) (*models.Todo, error) {
+func (r *mutationResolver) UpdateTodoCompleted(ctx context.Context, todoid string, title string) (*models.Todo, error) {
 	var todo models.Todo
 
-	// 指定されたtodoidのTodoを検索
-	if err := r.DB.Where("todoid = ?", todoid).First(&todo).Error; err != nil {
-		return nil, fmt.Errorf("Todo not found: %w", err)
+	// todoid と title で Todo を検索
+	if err := r.DB.Where("todoid = ? AND title = ?", todoid, title).First(&todo).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("Todo with ID '%s' and title '%s' not found", todoid, title)
+		}
+		return nil, fmt.Errorf("failed to find Todo: %w", err)
 	}
 
 	// completedをtrueに更新

@@ -64,7 +64,7 @@ type ComplexityRoot struct {
 		Createschedule      func(childComplexity int, input model.NewSchedule) int
 		LoginUser           func(childComplexity int, name string, password string) int
 		RegisterUser        func(childComplexity int, input model.NewUser) int
-		UpdateTodoCompleted func(childComplexity int, todoid string) int
+		UpdateTodoCompleted func(childComplexity int, todoid string, title string) int
 	}
 
 	Query struct {
@@ -122,7 +122,7 @@ type MutationResolver interface {
 	Createschedule(ctx context.Context, input model.NewSchedule) (*models.Schedule, error)
 	CreateSubject(ctx context.Context, input model.NewSubject) (*models.Subject, error)
 	CreateTodo(ctx context.Context, input *models.NewTodo) (*models.Todo, error)
-	UpdateTodoCompleted(ctx context.Context, todoid string) (*models.Todo, error)
+	UpdateTodoCompleted(ctx context.Context, todoid string, title string) (*models.Todo, error)
 	RegisterUser(ctx context.Context, input model.NewUser) (*models.User, error)
 	LoginUser(ctx context.Context, name string, password string) (*models.User, error)
 }
@@ -267,7 +267,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateTodoCompleted(childComplexity, args["todoid"].(string)), true
+		return e.complexity.Mutation.UpdateTodoCompleted(childComplexity, args["todoid"].(string), args["title"].(string)), true
 
 	case "Query.classroom":
 		if e.complexity.Query.Classroom == nil {
@@ -770,6 +770,15 @@ func (ec *executionContext) field_Mutation_updateTodoCompleted_args(ctx context.
 		}
 	}
 	args["todoid"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["title"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["title"] = arg1
 	return args, nil
 }
 
@@ -1312,7 +1321,7 @@ func (ec *executionContext) _Mutation_updateTodoCompleted(ctx context.Context, f
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateTodoCompleted(rctx, fc.Args["todoid"].(string))
+		return ec.resolvers.Mutation().UpdateTodoCompleted(rctx, fc.Args["todoid"].(string), fc.Args["title"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
