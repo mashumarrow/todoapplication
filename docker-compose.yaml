@@ -8,11 +8,14 @@ services:
     container_name: grahql-backend
     env_file:
       - ./backend/cmd/.env
-    command: sh -c "sh ./init.sh"
+    command: sh -c "sh /go/src/backend/init.sh"
+    volumes:
+      - ./backend:/go/src/backend
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
     image: mysql:8.0
