@@ -11,8 +11,8 @@ import {
 import { CREATE_TODO } from "../../../graphql/queries";
 
 type ScheduleEntry = {
-  subject: string;
-  classroom: string;
+  subjectname: string;
+  classroomname: string;
   todos?: string[]; // Todoリストを追加
 };
 
@@ -59,14 +59,15 @@ export default function TimeTable() {
   const [savedToken, setSavedToken] = useState<string | null>(null);
 
   const [userid, setUserid] = useState<string | null>(null);
-  const [getTodos, { data }] = useLazyQuery<{ todos: Todo[] }>(GET_TODOS, {
-    fetchPolicy: "cache-and-network", // キャッシュを優先し、必要に応じてネットワークから取得
-  });
   const { data: scheduleData } = useQuery(GET_SCHEDULES, {
     variables: { userid },
     skip: !userid,
-    fetchPolicy: "cache-and-network", // キャッシュを使わず、毎回ネットワークからデータを取得
+    fetchPolicy: "network-only",
   });
+  const [getTodos, { data }] = useLazyQuery<{ todos: Todo[] }>(GET_TODOS, {
+    fetchPolicy: "cache-and-network", // キャッシュを優先し、必要に応じてネットワークから取得
+  });
+
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     const storedUserid = localStorage.getItem("userid");
@@ -111,6 +112,28 @@ export default function TimeTable() {
 
       if (data && data.todos) {
         console.log("取得したTodoデータ:", data.todos);
+
+        const updatedSchedule: Schedule = { ...schedule };
+
+        data.todos.forEach((todo) => {
+          const key = `${todo.todoid}`;
+          if (!updatedSchedule[key]) {
+            updatedSchedule[key] = {
+              subjectname: "",
+              classroomname: "",
+              todos: [],
+            };
+          }
+          // todosが未定義の場合に初期化
+          if (!updatedSchedule[key].todos) {
+            updatedSchedule[key].todos = [];
+          }
+
+          updatedSchedule[key].todos.push(todo.title);
+        });
+
+        setSchedule(updatedSchedule); // scheduleを更新
+        console.log("更新されたスケジュール:", updatedSchedule);
       } else {
         console.warn("Todoデータが取得できませんでした。");
       }
@@ -119,50 +142,26 @@ export default function TimeTable() {
     }
   };
 
-  // データを処理してスケジュールを作成
-  useEffect(() => {
-    if (data && data.todos) {
-      const newSchedule: Schedule = {};
-      data.todos.forEach((todo) => {
-        const key = todo.todoid; // todoidがキーとして使われる
-        if (!newSchedule[key]) {
-          newSchedule[key] = {
-            subject: "", // 初期値として空文字を設定
-            classroom: "",
-            todos: [],
-          };
-        }
-        newSchedule[key].todos?.push(todo.title);
-      });
-
-      setSchedule(newSchedule);
-      console.log("更新されたスケジュール:", newSchedule);
-    }
-  }, [data]);
-
   // GET_SCHEDULESのデータを処理してスケジュールを作成
   useEffect(() => {
     if (scheduleData && scheduleData.schedules) {
       console.log("取得したスケジュールデータ:", scheduleData.schedules);
-      const newSchedule: Schedule = {};
 
+      const newSchedule: Schedule = {};
       scheduleData.schedules.forEach((sch: any) => {
-        console.log("dayofweek:", sch.dayofweek, "period:", sch.period);
-        const key = `${sch.dayofweek}-${sch.period}`; // dayofweekとperiodでキーを作成
+        const key = `${sch.dayofweek}-${sch.period}`;
         newSchedule[key] = {
-          subject: sch.subjectname || "", // subjectnameをセット
-          classroom: sch.classroomname || "", // classroomnameをセット
-          todos: schedule[key]?.todos || [], // 既存のtodosがあれば保持
+          subjectname: sch.subjectname || "", // subjectnameを使用
+          classroomname: sch.classroomname || "", // classroomnameを使用
+          todos: schedule[key]?.todos || [], // 既存のtodosを保持
         };
       });
-
-      // 既存のscheduleにマージする
+      console.log("newSchedule:", newSchedule);
+      // 既存のデータにマージ
       setSchedule((prevSchedule) => ({
-        ...prevSchedule,
-        ...newSchedule,
+        ...prevSchedule, // 既存データを保持
+        ...newSchedule, // 新しいデータを上書き
       }));
-
-      console.log("取得したスケジュールデータ:", newSchedule);
     }
   }, [scheduleData]);
 
@@ -192,8 +191,8 @@ export default function TimeTable() {
     setSelectedCell({ dayofweek, period });
     const key = `${dayofweek}${period}`;
     const cellData = schedule[key] || {};
-    setSubject(cellData.subject || "");
-    setClassroom(cellData.classroom || "");
+    setSubject(cellData.subjectname || "");
+    setClassroom(cellData.classroomname || "");
     setIsModalOpen(true);
   };
 
@@ -325,8 +324,8 @@ export default function TimeTable() {
         setSchedule((prevSchedule) => ({
           ...prevSchedule,
           [key]: {
-            subject,
-            classroom,
+            subjectname: subject,
+            classroomname: classroom,
             todos: prevSchedule[key]?.todos || [],
           },
         }));
@@ -370,8 +369,10 @@ export default function TimeTable() {
                     className="border border-gray-300 w-24 h-24 bg-cream relative text-center cursor-pointer"
                     onClick={() => openModal(day, period)} // セルをクリックで教科名・教室名を追加
                   >
-                    <div className="text-textbrown">{cellData.subject}</div>
-                    <div className="text-textbrown">{cellData.classroom}</div>
+                    <div className="text-textbrown">{cellData.subjectname}</div>
+                    <div className="text-textbrown">
+                      {cellData.classroomname}
+                    </div>
 
                     <button
                       className="absolute bottom-1 right-1 text-gray-600"
