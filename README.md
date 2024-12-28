@@ -17,7 +17,7 @@
 ***
 | ログイン画面| 時間割画面|科目登録画面|
 | --- | --- | --- |
-| <image src="https://github.com/mashumarrow/the_mind/assets/134787738/0d0f05bc-69ed-48fc-9522-002ef1f269d3" width=300>|<image src="https://github.com/mashumarrow/the_mind/assets/134787738/b3d6da02-e9b7-4a0f-81a7-1f48a0eed05a" width=300>|<image src="https://github.com/mashumarrow/the_mind/assets/134787738/b6d25f13-1332-4e55-8eb4-6b0fe72659c9" width=300>|
+| <image src="https://github.com/user-attachments/assets/de0ca3b8-3ad5-4c8d-849c-1e09c7a2f23c" width=300>|<image src="https://github.com/user-attachments/assets/d3467e98-6636-4964-87cf-0f2c2c21090e" width=300>|<image src="https://github.com/user-attachments/assets/faeb57e3-8ec9-4f26-bcc8-f66a32d5cc9a" width=300>|
 | ルールを確認したら<br>名前を入力しボタンをタップ |４人部屋に入るまで待っています。<br>あと何人はいればスタートするか<br>表示しています。  |1～100までのカードを１人２枚<br>ランダムで配布しています。|
 <br>
 
