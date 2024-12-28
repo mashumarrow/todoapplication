@@ -9,7 +9,7 @@
    
 ## ■操作方法
 ***
-| スタート画面| wating画面|カード配布画面|
+| ログイン画面| 時間割画面|科目登録画面|
 | --- | --- | --- |
 | <image src="https://github.com/mashumarrow/the_mind/assets/134787738/0d0f05bc-69ed-48fc-9522-002ef1f269d3" width=300>|<image src="https://github.com/mashumarrow/the_mind/assets/134787738/b3d6da02-e9b7-4a0f-81a7-1f48a0eed05a" width=300>|<image src="https://github.com/mashumarrow/the_mind/assets/134787738/b6d25f13-1332-4e55-8eb4-6b0fe72659c9" width=300>|
 | ルールを確認したら<br>名前を入力しボタンをタップ |４人部屋に入るまで待っています。<br>あと何人はいればスタートするか<br>表示しています。  |1～100までのカードを１人２枚<br>ランダムで配布しています。|
