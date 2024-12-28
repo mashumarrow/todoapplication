@@ -21,10 +21,10 @@
 | ルールを確認したら<br>名前を入力しボタンをタップ |４人部屋に入るまで待っています。<br>あと何人はいればスタートするか<br>表示しています。  |
 <br>
 
-| プレイ画面| クリア画面|失敗 画面|
-| --- | --- |  
-|<image src="https://github.com/user-attachments/assets/faeb57e3-8ec9-4f26-bcc8-f66a32d5cc9a" width=600>|<image src="https://github.com/mashumarrow/the_mind/assets/134787738/e2abbcf1-7cce-4d82-8783-52507b06e43e" width=300>| <image src="https://github.com/mashumarrow/the_mind/assets/134787738/4f36c2ce-d4ba-4960-9ebb-5d5dd7b9abca" width=300>|
-|スタンプの相手のリアクションで<br>予想しながら数の小さい順にカードを<br>タップします。ただしスタンプを押せるのは<br>チームで３回まで。|正しく数の小さい順に出せればクリア|正しく数の小さい順に出せなければ失敗  |<br><br>
+| 科目登録画面| todo画面|
+| --- | --- | 
+| <image src="https://github.com/user-attachments/assets/faeb57e3-8ec9-4f26-bcc8-f66a32d5cc9a" width=600>|<image src="https://github.com/user-attachments/assets/5b88759f-0b03-4775-ba43-30522b910cd9" width=600>|
+| ルールを確認したら<br>名前を入力しボタンをタップ |４人部屋に入るまで待っています。<br>あと何人はいればスタートするか<br>表示しています。  |<br><br>
 
 ## ■使用技術
 ***
