@@ -6,7 +6,7 @@
 
 <img src="https://github.com/user-attachments/assets/60599e10-56d2-4b44-9784-0be20669d473" width=300>
    
-## ■遊び方
+## ■操作方法
 ***
 | スタート画面| wating画面|カード配布画面|
 | --- | --- | --- |
