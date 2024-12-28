@@ -1,19 +1,7 @@
 ![757073319 311333](https://github.com/user-attachments/assets/60599e10-56d2-4b44-9784-0be20669d473)
-<h1 align="center"> 
-   🃏ザ・マインド🃏
-</h1>
 
-***
-<p align="center">
-<img src="https://github.com/mashumarrow/the_mind/assets/134787738/5d5307eb-2e58-40a4-8de0-ba18c95dc4f8" width=800>
-</p>
-<br>
 
-## ■ゲームのURL
-***
- 4人で協力して進める心理戦カードゲームです。<br>
-https://the-mind-game.vercel.app/
-## ■ゲームのイメージ
+## ■時間割todo
 ***
 <p align="center">
 <img src="https://github.com/user-attachments/assets/60599e10-56d2-4b44-9784-0be20669d473" width=300>
