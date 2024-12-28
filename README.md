@@ -5,7 +5,7 @@
 
 ***
 <p align="center">
-<img src="https://github.com/mashumarrow/the_mind/assets/134787738/5d5307eb-2e58-40a4-8de0-ba18c95dc4f8" >
+<img src="https://github.com/mashumarrow/the_mind/assets/134787738/5d5307eb-2e58-40a4-8de0-ba18c95dc4f8" width=300>
 </p>
 <br>
 
