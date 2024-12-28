@@ -17,7 +17,7 @@
 ***
 | ログイン画面| 時間割画面|科目登録画面|
 | --- | --- | --- |
-| <image src="https://github.com/user-attachments/assets/de0ca3b8-3ad5-4c8d-849c-1e09c7a2f23c" width=300>|<image src="https://github.com/user-attachments/assets/d3467e98-6636-4964-87cf-0f2c2c21090e" width=300>|<image src="https://github.com/user-attachments/assets/faeb57e3-8ec9-4f26-bcc8-f66a32d5cc9a" width=300>|
+| <image src="https://github.com/user-attachments/assets/de0ca3b8-3ad5-4c8d-849c-1e09c7a2f23c" width=400>|<image src="https://github.com/user-attachments/assets/d3467e98-6636-4964-87cf-0f2c2c21090e" width=400>|<image src="https://github.com/user-attachments/assets/faeb57e3-8ec9-4f26-bcc8-f66a32d5cc9a" width=300>|
 | ルールを確認したら<br>名前を入力しボタンをタップ |４人部屋に入るまで待っています。<br>あと何人はいればスタートするか<br>表示しています。  |1～100までのカードを１人２枚<br>ランダムで配布しています。|
 <br>
 
