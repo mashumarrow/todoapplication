@@ -2,6 +2,7 @@
 
 ## ■時間割todo
 ***
+各科目ごとにtodolistを作成した．
 <p align="center">
 
 <img src="https://github.com/user-attachments/assets/60599e10-56d2-4b44-9784-0be20669d473" width=300>
