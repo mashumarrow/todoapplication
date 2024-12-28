@@ -1,10 +1,9 @@
-![757073319 311333](https://github.com/user-attachments/assets/60599e10-56d2-4b44-9784-0be20669d473)
 
 
 ## ■時間割todo
 ***
 <p align="center">
-![757073319 311333](https://github.com/user-attachments/assets/60599e10-56d2-4b44-9784-0be20669d473)
+
 <img src="https://github.com/user-attachments/assets/60599e10-56d2-4b44-9784-0be20669d473" width=300>
    
 ## ■遊び方
