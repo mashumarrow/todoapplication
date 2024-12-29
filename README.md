@@ -29,13 +29,13 @@
 ・NextJS(v14) App Router<br>
 ・TailwindCSS<br>
 ・ApolloClient<br>
-・Docker
-・Go
-・Gorm
-・gqlgen
-・go-sqlmock
-・goose
-・MySQL
+・Docker<br>
+・Go<br>
+・Gorm<br>
+・gqlgen<br>
+・go-sqlmock<br>
+・goose<br>
+・MySQL<br>
 ## ■作成した背景
 ***
 大学で,課題などしなければならないことを科目ごとに分けた<br>
