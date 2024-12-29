@@ -1,10 +1,3 @@
-![スクリーンショット 2024-12-28 193121](https://github.com/user-attachments/assets/de0ca3b8-3ad5-4c8d-849c-1e09c7a2f23c)
-![スクリーンショット 2024-12-28 193146](https://github.com/user-attachments/assets/d3467e98-6636-4964-87cf-0f2c2c21090e)
-![スクリーンショット 2024-12-28 193203](https://github.com/user-attachments/assets/faeb57e3-8ec9-4f26-bcc8-f66a32d5cc9a)
-![スクリーンショット 2024-
-![スクリーンショット 2024-12-28 193307](https://github.com/user-attachments/assets/5b88759f-0b03-4775-ba43-30522b910cd9)
-12-28 193239](https://github.com/user-attachments/assets/55386477-6adb-4e96-8679-68ccb90f9480)
-
 
 ## ■時間割todo
 ***
@@ -28,22 +21,24 @@
 
 ## ■使用技術
 ***
-・React<br>
-・supabase<br>
+・TypeScript<br>
+・NextJS(v14) App Router<br>
 ・TailwindCSS<br>
-・vite<br>
-[![My Skills](https://skillicons.dev/icons?i=react,supabase,tailwindcss,vite)](https://skillicons.dev)
-
-
-
-## ■工夫した点
+・ApolloClient<br>
+・Docker
+・Go
+・Gorm
+・gqlgen
+・go-sqlmock
+・goose
+・MySQL
+## ■作成した背景
 ***
-・シンプルでわかりやすいUIにした。<br>
-・オンラインなので相手の表情は見えないためスタンプ機能を使った。<br>
-・スタンプのチームで使える回数を３回とした。<br>
-・リアルタイムでゲームできるようにした。
+大学で,課題などしなければならないことを科目ごとに分けた<br>
+todoリストがあった方が忘れないと思いこのようなものが欲しかったため．
 
-## ■今後の展望
+
+## ■挑戦した点
 ***
-・大人数が入っても耐えれるサーバーを作りたい。<br>
-・時間制限などつけていきたい。
+・認証機能<br>
+・モーダル機能
