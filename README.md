@@ -10,7 +10,7 @@
 ***
 | ログイン画面| 時間割画面|
 | --- | --- | 
-| <image src="https://github.com/user-attachments/assets/de0ca3b8-3ad5-4c8d-849c-1e09c7a2f23c" width=500>|<image src="https://github.com/user-attachments/assets/5b88759f-0b03-4775-ba43-30522b910cd9" width=500>|
+| <image src="https://github.com/user-attachments/assets/de0ca3b8-3ad5-4c8d-849c-1e09c7a2f23c" width=600>|<image src="https://github.com/user-attachments/assets/5b88759f-0b03-4775-ba43-30522b910cd9" width=500>|
 | 新規の方は名前とパスワードを登録します．<br>登録出来たらもう一度登録した名前とパスワードを入力しログインします． |各時間のマスをタップすると科目登録画面，＋ボタンを押すとその科目のtodolistが開きます．  |
 <br>
 
