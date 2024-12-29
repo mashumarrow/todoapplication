@@ -24,7 +24,7 @@
 | 科目登録画面| todo画面|
 | --- | --- | 
 | <image src="https://github.com/user-attachments/assets/faeb57e3-8ec9-4f26-bcc8-f66a32d5cc9a" width=600>|<image src="https://github.com/user-attachments/assets/bbe07bb9-d106-41c7-92b5-d1c473bc8925" width=600>|
-| ルールを確認したら<br>名前を入力しボタンをタップ |４人部屋に入るまで待っています。<br>あと何人はいればスタートするか<br>表示しています。  |<br><br>
+| 教科名と教室名を登録すると，時間割画面に反映します． |各科目のtodoを入力します．todoが終わった時はそのtodoの済ボタンを押すと完了したことになります．|<br><br>
 
 ## ■使用技術
 ***
