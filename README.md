@@ -5,7 +5,7 @@
 ・npm run dev<br>
 ・docker-compose build<br>
 ・docker-compose up<br>
-このコマンドを打つと開きます<br>
+このコマンドを打つと立ち上がります<br>
 <p align="center">
 
 <img src="https://github.com/user-attachments/assets/60599e10-56d2-4b44-9784-0be20669d473" width=300>
