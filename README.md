@@ -1,5 +1,5 @@
 
-## ■時間割todo
+## ■時間割各科目todo
 ***
 各科目ごとのtodolist<br>
 ・npm run dev<br>
