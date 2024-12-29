@@ -18,12 +18,12 @@
 | ログイン画面| 時間割画面|
 | --- | --- | 
 | <image src="https://github.com/user-attachments/assets/de0ca3b8-3ad5-4c8d-849c-1e09c7a2f23c" width=600>|<image src="https://github.com/user-attachments/assets/5b88759f-0b03-4775-ba43-30522b910cd9" width=600>|
-| ルールを確認したら<br>名前を入力しボタンをタップ |４人部屋に入るまで待っています。<br>あと何人はいればスタートするか<br>表示しています。  |
+| 新規の方は名前とパスワードを登録します．<br>登録出来たらもう一度登録した名前とパスワードを入力しログインします． |<br>あと何人はいればスタートするか<br>表示しています。  |
 <br>
 
 | 科目登録画面| todo画面|
 | --- | --- | 
-| <image src="https://github.com/user-attachments/assets/faeb57e3-8ec9-4f26-bcc8-f66a32d5cc9a" width=600>|<image src="https://github.com/user-attachments/assets/5b88759f-0b03-4775-ba43-30522b910cd9" width=600>|
+| <image src="https://github.com/user-attachments/assets/faeb57e3-8ec9-4f26-bcc8-f66a32d5cc9a" width=600>|<image src="https://github.com/user-attachments/assets/bbe07bb9-d106-41c7-92b5-d1c473bc8925" width=600>|
 | ルールを確認したら<br>名前を入力しボタンをタップ |４人部屋に入るまで待っています。<br>あと何人はいればスタートするか<br>表示しています。  |<br><br>
 
 ## ■使用技術
