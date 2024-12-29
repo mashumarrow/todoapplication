@@ -17,7 +17,7 @@
 ***
 | ログイン画面| 時間割画面|
 | --- | --- | 
-| <image src="https://github.com/user-attachments/assets/de0ca3b8-3ad5-4c8d-849c-1e09c7a2f23c" width=600>|<image src="https://github.com/user-attachments/assets/d3467e98-6636-4964-87cf-0f2c2c21090e" width=600>|
+| <image src="https://github.com/user-attachments/assets/de0ca3b8-3ad5-4c8d-849c-1e09c7a2f23c" width=600>|<image src="https://github.com/user-attachments/assets/5b88759f-0b03-4775-ba43-30522b910cd9" width=600>|
 | ルールを確認したら<br>名前を入力しボタンをタップ |４人部屋に入るまで待っています。<br>あと何人はいればスタートするか<br>表示しています。  |
 <br>
 
