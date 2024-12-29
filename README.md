@@ -2,6 +2,10 @@
 ## ■時間割todo
 ***
 各科目ごとのtodolist
+・npm run dev
+・docker-compose build
+・docker-compose up
+このコマンドを打つと開きます
 <p align="center">
 
 <img src="https://github.com/user-attachments/assets/60599e10-56d2-4b44-9784-0be20669d473" width=300>
